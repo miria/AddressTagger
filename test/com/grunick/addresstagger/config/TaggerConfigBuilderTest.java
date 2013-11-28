@@ -4,12 +4,14 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
+import java.util.Map;
+
 import org.apache.commons.configuration.BaseConfiguration;
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.configuration.ConfigurationException;
 import org.junit.Test;
 
-import com.grunick.addresstagger.strategy.MaximumLikelihoodStrategy;
+import com.grunick.addresstagger.strategy.NoOpTaggerStrategy;
 
 public class TaggerConfigBuilderTest {
 	
@@ -31,8 +33,8 @@ public class TaggerConfigBuilderTest {
 	public void testLoadStrategyKnown() throws ConfigurationException {
 		TaggerConfig taggerConf = new TaggerConfig();
 		Configuration conf = new BaseConfiguration();
-		conf.setProperty("strategy", "maximumLikelihood");
-		assertTrue(TaggerConfigBuilder.loadStrategy(conf, taggerConf) instanceof MaximumLikelihoodStrategy);
+		conf.setProperty("strategy", "noop");
+		assertTrue(TaggerConfigBuilder.loadStrategy(conf, taggerConf) instanceof NoOpTaggerStrategy);
 	}
 	
 	@Test(expected=ConfigurationException.class)
@@ -54,6 +56,20 @@ public class TaggerConfigBuilderTest {
 	public void testLoadConfiguration() throws ConfigurationException {
 		TaggerConfig config = TaggerConfigBuilder.loadConfiguration("data/test.properties");
 		assertNotNull(config);
+	}
+	
+	@Test
+	public void testGetInputSourceConfig() {
+		Configuration conf = new BaseConfiguration();
+		conf.setProperty("prefix.key1", "value1");
+		conf.setProperty("prefix.key2", "value2");
+		conf.setProperty("notprefix.key3", "value3");
+		
+		Map<String,String> config = TaggerConfigBuilder.getInputSourceConfig("prefix", conf);
+		assertEquals(config.get("key1"), "value1");
+		assertEquals(config.get("key2"), "value2");
+		assertEquals(config.get("key3"), null);
+		
 	}
 	
 	

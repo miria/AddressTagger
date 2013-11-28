@@ -1,5 +1,9 @@
 package com.grunick.addresstagger.config;
 
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
+
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.PropertiesConfiguration;
@@ -43,16 +47,17 @@ public class TaggerConfigBuilder {
 
 	protected static InputSource loadInputSource(String keyPrefix, Configuration properties) throws ConfigurationException {
 		String type = properties.getString(keyPrefix+".type");
+		Map<String,String> sourceConfig = getInputSourceConfig(keyPrefix, properties);
+
 		try {
-			if ("file".equalsIgnoreCase(type)) {
-				String filename = properties.getString(keyPrefix+".filename");
-				String headerFile = properties.getString(keyPrefix+".header_file");
-				return InputSourceFactory.makeFileInputSource(filename, headerFile);
-			}
-		} catch (InputException i) {
-			throw new ConfigurationException("Unable to instantiate store: "+i.getMessage());
+			InputSource source = InputSourceFactory.makeInputSource(type, sourceConfig);
+			if (source == null)
+				throw new ConfigurationException("Unknown input source type \""+type+"\"");
+			return source;
+		} catch (InputException e) {
+			throw new ConfigurationException("Error creating source: "+e.getMessage());
 		}
-		throw new ConfigurationException("Unknown input source type \""+type+"\"");
+
 	}
 	
 	protected static TaggerStrategy loadStrategy(Configuration properties, TaggerConfig config) throws ConfigurationException {
@@ -62,6 +67,17 @@ public class TaggerConfigBuilder {
 			throw new ConfigurationException("Unknown tagger strategy \""+type+"\"");
 		return strategy;
 		
+	}
+	
+	protected static Map<String,String> getInputSourceConfig(String prefix, Configuration properties) {
+		Map<String,String> sourceConfig = new HashMap<String,String>();
+		
+		for (Iterator<String> keysIter = properties.getKeys(prefix); keysIter.hasNext(); ) {
+			String key = keysIter.next();
+			sourceConfig.put(key.substring(prefix.length()+1, key.length()), properties.getString(key));
+		}
+		
+		return sourceConfig;
 	}
 
 }

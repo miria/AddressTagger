@@ -1,14 +1,15 @@
 package com.grunick.addresstagger.mock;
 
+import java.util.List;
+import java.util.Map;
+
 import com.grunick.addresstagger.data.Address;
+import com.grunick.addresstagger.data.AddressTag;
+import com.grunick.addresstagger.input.InputException;
 import com.grunick.addresstagger.input.InputSource;
 
 public class MockInputSource implements InputSource {
 
-	@Override
-	public void open() {
-		
-	}
 
 	@Override
 	public Address getNext() {
@@ -21,13 +22,28 @@ public class MockInputSource implements InputSource {
 	}
 
 	@Override
-	public String getType() {
+	public int getRecordIndex() {
+		return 0;
+	}
+
+	@Override
+	public boolean hasNext() {
+		return false;
+	}
+
+	@Override
+	public List<String> getColumnNames() {
 		return null;
 	}
 
 	@Override
-	public int getRecordIndex() {
-		return 0;
+	public Map<String, AddressTag> getColumnToTagMap() {
+		return null;
+	}
+
+	@Override
+	public void init() throws InputException {
+		
 	}
 
 }

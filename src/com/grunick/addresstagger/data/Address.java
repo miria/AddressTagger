@@ -1,20 +1,40 @@
 package com.grunick.addresstagger.data;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
 public class Address {
 	
 	protected String fullName;	
-	protected List<Term> addressTokens;
+	protected List<String> addressTokens;
+	protected List<AddressTag> knownTags;
+	protected List<AddressTag> guessedTags;
 	
-	public Address(String fullName, List<Term> addressTokens) {
+	public Address(String fullName, List<String> nameTokens, List<AddressTag> knownTags) {
 		this.fullName = fullName;
-		this.addressTokens = addressTokens;
+		this.addressTokens = nameTokens;
+		this.knownTags = knownTags;
+		AddressTag[] unknownTags = new AddressTag[addressTokens.size()];
+		Arrays.fill(unknownTags, AddressTag.UNK);
+		this.guessedTags = new ArrayList<AddressTag>(Arrays.asList(unknownTags));
 	}
 	
-	public List<Term> getAddressTokens() {
+	public List<String> getAddressTokens() {
 		return Collections.unmodifiableList(addressTokens);
+	}
+	
+	public List<AddressTag> getKnownTags() {
+		return Collections.unmodifiableList(knownTags);
+	}
+	
+	public List<AddressTag> getGuessedTags() {
+		return Collections.unmodifiableList(guessedTags);
+	}
+	
+	public void setTag(int position, AddressTag tag) {
+		guessedTags.set(position, tag);
 	}
 	
 	public int size() {

@@ -6,15 +6,15 @@ import static org.junit.Assert.assertSame;
 import org.junit.Test;
 
 import com.grunick.addresstagger.input.InputSource;
-import com.grunick.addresstagger.mock.MockInputSource;
-import com.grunick.addresstagger.mock.MockTaggerStrategy;
+import com.grunick.addresstagger.input.NoOpInputSource;
+import com.grunick.addresstagger.strategy.NoOpTaggerStrategy;
 import com.grunick.addresstagger.strategy.TaggerStrategy;
 
 public class TaggerConfigTest {
 	
 	@Test
 	public void testTrainingData() {
-		InputSource source = new MockInputSource();
+		InputSource source = new NoOpInputSource();
 		TaggerConfig config = new TaggerConfig();
 		config.setTrainingData(source);
 		assertSame(source, config.getTrainingData());
@@ -22,7 +22,7 @@ public class TaggerConfigTest {
 	
 	@Test
 	public void testValidationData() {
-		InputSource source = new MockInputSource();
+		InputSource source = new NoOpInputSource();
 		TaggerConfig config = new TaggerConfig();
 		config.setValidationData(source);
 		assertSame(source, config.getValidationData());
@@ -30,7 +30,7 @@ public class TaggerConfigTest {
 	
 	@Test
 	public void testTestData() {
-		InputSource source = new MockInputSource();
+		InputSource source = new NoOpInputSource();
 		TaggerConfig config = new TaggerConfig();
 		config.setTestData(source);
 		assertSame(source, config.getTestData());
@@ -77,7 +77,7 @@ public class TaggerConfigTest {
 	
 	@Test
 	public void testStrategy() {
-		TaggerStrategy strategy = new MockTaggerStrategy();
+		TaggerStrategy strategy = new NoOpTaggerStrategy();
 		TaggerConfig config = new TaggerConfig();
 		config.setTaggerStrategy(strategy);
 		assertSame(strategy, config.getTaggerStrategy());

@@ -27,7 +27,7 @@ public class FileInputSource implements InputSource {
 	
 	private String delimiter;
 	
-	public FileInputSource(String filename, String headerFile, String delimiter) throws InputException {
+	public FileInputSource(String filename, String headerFile, String delimiter) {
 		this.dataFile = new File(filename);
 		this.headerFile = new File(headerFile);
 		this.delimiter = delimiter;

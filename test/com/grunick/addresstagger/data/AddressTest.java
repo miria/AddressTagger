@@ -9,40 +9,72 @@ import org.junit.Test;
 
 public class AddressTest {
 	
-	@Test
-	public void testFullName() {
-		List<Term> terms = Arrays.asList(new Term[] {new Term("123", 0, AddressTag.NUM), 
-			      new Term("Main", 1, AddressTag.STR)});
-		Address address = new Address("123 Main", terms);
-		
-		assertEquals(address.getFullName(), "123 Main");
+	protected Address getAddress() {
+		List<String> addressTokens = Arrays.asList(new String[]{"123", "Main", "St"});
+		List<AddressTag> tagList = Arrays.asList(new AddressTag[] {AddressTag.NUM, AddressTag.STR, AddressTag.SFX});
+		return new Address("123 Main St", addressTokens, tagList);
 	}
 	
 	@Test
-	public void testTerms() {
-		List<Term> terms = Arrays.asList(new Term[] {new Term("123", 0, AddressTag.NUM), 
-			      new Term("Main", 1, AddressTag.STR)});
-		Address address = new Address("123 Main", terms);
-				
-		assertEquals(address.getAddressTokens(), terms);
+	public void testFullName() {
+		Address address = getAddress();
+		assertEquals(address.getFullName(), "123 Main St");
+	}
+	
+	@Test
+	public void testKnownTags() {
+		Address address = getAddress();
+		assertEquals(address.getKnownTags(), Arrays.asList(new AddressTag[]{AddressTag.NUM, AddressTag.STR, AddressTag.SFX}));
 	}
 	
 	@Test(expected=UnsupportedOperationException.class)
-	public void testTermsUnmodifiable() {
-		List<Term> terms = Arrays.asList(new Term[] {new Term("123", 0, AddressTag.NUM), 
-			      new Term("Main", 1, AddressTag.STR)});
-		Address address = new Address("123 Main", terms);
-				
-		address.getAddressTokens().add(new Term("St", 1, AddressTag.SFX));
+	public void testKnownTagsUnmodifiable() {
+		Address address = getAddress();
+		address.getKnownTags().add(AddressTag.UNK);
+	}
+	
+	@Test
+	public void testGuessedTags() {
+		Address address = getAddress();
+		assertEquals(address.getGuessedTags(), Arrays.asList(new AddressTag[]{AddressTag.UNK, AddressTag.UNK, AddressTag.UNK}));
+	}
+	
+	@Test(expected=UnsupportedOperationException.class)
+	public void testGuessedTagsUnmodifiable() {
+		Address address = getAddress();
+		address.getGuessedTags().add(AddressTag.UNK);
+	}
+	
+	@Test
+	public void testAddressTokens() {
+		Address address = getAddress();
+		assertEquals(address.getAddressTokens(), Arrays.asList(new String[] {"123", "Main", "St"}) );
+	}
+	
+	@Test(expected=UnsupportedOperationException.class)
+	public void testAddressTokensUnmodifiable() {
+		Address address = getAddress();
+		address.getAddressTokens().add("token");
 	}
 	
 	@Test
 	public void testSize() {
-		List<Term> terms = Arrays.asList(new Term[] {new Term("123", 0, AddressTag.NUM), 
-			      new Term("Main", 1, AddressTag.STR)});
-		Address address = new Address("123 Main", terms);
-				
-		assertEquals(address.size(), 2);
+		Address address = getAddress();
+		assertEquals(address.size(), 3);
 	}
 
+	@Test
+	public void testAddGuessedTagValid() {
+		Address address = getAddress();
+		address.setTag(1, AddressTag.STR);
+		assertEquals(address.getGuessedTags(), Arrays.asList(new AddressTag[]{AddressTag.UNK, AddressTag.STR, AddressTag.UNK}));
+	}
+	
+	@Test(expected=IndexOutOfBoundsException.class)
+	public void testAddGuessedTagInvalid() {
+		Address address = getAddress();
+		address.setTag(7, AddressTag.STR);
+	}
+	
+	
 }

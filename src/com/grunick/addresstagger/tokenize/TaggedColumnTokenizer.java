@@ -57,7 +57,7 @@ public class TaggedColumnTokenizer implements Tokenizer {
 
 		for (AddressTag tag : address.getKnownTags()) {
 			if (tag == AddressTag.UNK)
-				throw new InputException("Could not classify all tags: "+name+" -> "+address.getKnownTags());
+				throw new InputException("Could not classify all tags: "+name+" -> "+address.getKnownTags()+" "+row);
 		}
 		
 		return address;
@@ -67,7 +67,7 @@ public class TaggedColumnTokenizer implements Tokenizer {
 		if (StringUtils.isBlank(name))
 			return new ArrayList<String>();
 		
-		// TODO: Do we tokenize on punctuation as well?
+		name = name.replaceAll("\\-", " ");
 		return new ArrayList<String>(Arrays.asList(StringUtils.split(name)));
 	}
 

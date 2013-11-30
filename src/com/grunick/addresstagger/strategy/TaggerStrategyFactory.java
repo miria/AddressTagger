@@ -8,8 +8,8 @@ public class TaggerStrategyFactory {
 	private TaggerStrategyFactory() {}
 	
 	public static TaggerStrategy makeStrategy(String type, TaggerConfig config) {
-		if (StrategyTypes.MAX_LIKELIHOOD_STRATEGY.equalsIgnoreCase(type))
-			return new MaximumLikelihoodStrategy();
+		if (StrategyTypes.MOST_FREQUENT_STRATEGY.equalsIgnoreCase(type))
+			return new MostFrequentTagStrategy();
 		if (StrategyTypes.NO_OP_STRATEGY.equalsIgnoreCase(type))
 			return new NoOpTaggerStrategy();
 		return null;

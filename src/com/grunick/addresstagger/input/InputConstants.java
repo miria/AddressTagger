@@ -31,6 +31,6 @@ public class InputConstants {
 
 	public static class StrategyTypes {
 		public static final String NO_OP_STRATEGY= "noop";
-		public static final String MAX_LIKELIHOOD_STRATEGY = "maximumLikelihood";
+		public static final String MOST_FREQUENT_STRATEGY = "mostFrequent";
 	}
 }

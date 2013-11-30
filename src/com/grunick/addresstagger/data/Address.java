@@ -25,6 +25,7 @@ public class Address {
 		return Collections.unmodifiableList(addressTokens);
 	}
 	
+	
 	public List<AddressTag> getKnownTags() {
 		return Collections.unmodifiableList(knownTags);
 	}
@@ -44,5 +45,6 @@ public class Address {
 	public String getFullName() {
 		return fullName;
 	}
+
 
 }

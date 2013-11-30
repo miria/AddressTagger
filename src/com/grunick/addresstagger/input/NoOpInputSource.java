@@ -30,11 +30,6 @@ public class NoOpInputSource implements InputSource {
 	}
 
 	@Override
-	public int getRecordIndex() {
-		return 0;
-	}
-
-	@Override
 	public List<String> getColumnNames() {
 		return new ArrayList<String>();
 	}

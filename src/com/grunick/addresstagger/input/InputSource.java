@@ -16,8 +16,6 @@ public interface InputSource {
 	public void close();
 	
 	public void init() throws InputException;
-		
-	public int getRecordIndex();
 	
 	public List<String> getColumnNames();
 	

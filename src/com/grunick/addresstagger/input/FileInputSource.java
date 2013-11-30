@@ -20,9 +20,7 @@ public class FileInputSource implements InputSource {
 	protected File dataFile;
 	protected LineIterator inputIterator;
 	protected Tokenizer tokenizer;
-	
-	protected int counter = -1;
-	
+		
 	protected Map<String, AddressTag> columnToTagMap = new HashMap<String,AddressTag>();
 	protected List<String> columnNames;
 	
@@ -75,7 +73,6 @@ public class FileInputSource implements InputSource {
 		
 		Address address = tokenizer.tokenizeAddress(Arrays.asList(pieces));
 		
-		counter++;
 		return address;
 	}
 
@@ -94,10 +91,6 @@ public class FileInputSource implements InputSource {
 		return Collections.unmodifiableMap(columnToTagMap);
 	}
 
-	@Override
-	public int getRecordIndex() {
-		return counter;
-	}
 
 	@Override
 	public void setTokenizer(Tokenizer tokenizer) {

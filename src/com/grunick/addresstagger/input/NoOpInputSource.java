@@ -7,6 +7,7 @@ import java.util.Map;
 
 import com.grunick.addresstagger.data.Address;
 import com.grunick.addresstagger.data.AddressTag;
+import com.grunick.addresstagger.tokenize.Tokenizer;
 
 public class NoOpInputSource implements InputSource {
 
@@ -41,6 +42,10 @@ public class NoOpInputSource implements InputSource {
 	@Override
 	public Map<String, AddressTag> getColumnToTagMap() {
 		return new HashMap<String,AddressTag>();
+	}
+
+	@Override
+	public void setTokenizer(Tokenizer tokenizer) {		
 	}
 
 }

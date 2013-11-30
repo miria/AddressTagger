@@ -7,8 +7,13 @@ import com.grunick.addresstagger.data.Address;
 public class NoOpTokenizer implements Tokenizer {
 
 	@Override
-	public Address tokenizeName(String name, List<String> row) {
+	public Address tokenizeAddress(List<String> row) {
 		return null; 
+	}
+
+	@Override
+	public void setColumns(List<String> columns) {
+		
 	}
 
 }

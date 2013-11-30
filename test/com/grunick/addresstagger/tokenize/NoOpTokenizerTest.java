@@ -11,7 +11,7 @@ public class NoOpTokenizerTest {
 	@Test
 	public void testNoOpTokenizer() {
 		NoOpTokenizer tokenizer = new NoOpTokenizer();
-		assertNull(tokenizer.tokenizeName("name", new ArrayList<String>()));
+		assertNull(tokenizer.tokenizeAddress(new ArrayList<String>()));
 	}
 
 }

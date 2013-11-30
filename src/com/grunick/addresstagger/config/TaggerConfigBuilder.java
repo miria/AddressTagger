@@ -1,5 +1,8 @@
 package com.grunick.addresstagger.config;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -14,14 +17,24 @@ import com.grunick.addresstagger.input.InputSource;
 import com.grunick.addresstagger.input.InputSourceFactory;
 import com.grunick.addresstagger.strategy.TaggerStrategy;
 import com.grunick.addresstagger.strategy.TaggerStrategyFactory;
+import com.grunick.addresstagger.tokenize.Tokenizer;
+import com.grunick.addresstagger.tokenize.TokenizerFactory;
 
 public class TaggerConfigBuilder {
 	
 	private TaggerConfigBuilder() {}
 	
 	public static TaggerConfig loadConfiguration(String filename) throws ConfigurationException {
+		
 		TaggerConfig config = new TaggerConfig();
-		Configuration properties = new PropertiesConfiguration(filename);
+		PropertiesConfiguration properties = new PropertiesConfiguration();
+		properties.setDelimiterParsingDisabled(true);
+
+		try {
+			properties.load(new FileReader(new File(filename)));
+		} catch (FileNotFoundException e) {
+			throw new ConfigurationException("Unable to load the file \""+filename+"\"");
+		}
 		
 		config.setValidationMode(parseBoolean("run_validation", properties));
 		config.setTestMode(parseBoolean("run_test", properties));
@@ -46,13 +59,23 @@ public class TaggerConfigBuilder {
 	}
 
 	protected static InputSource loadInputSource(String keyPrefix, Configuration properties) throws ConfigurationException {
-		String type = properties.getString(keyPrefix+".type");
-		Map<String,String> sourceConfig = getInputSourceConfig(keyPrefix, properties);
+		String sourceType = properties.getString(keyPrefix+".type");
+		String tokenizerType = properties.getString(keyPrefix+".tokenizer.type");
+		Map<String,String> sourceConfig = getInputConfig(keyPrefix, properties);
+		Map<String,String> tokenizerConfig = getInputConfig(keyPrefix+".tokenizer", properties);
 
 		try {
-			InputSource source = InputSourceFactory.makeInputSource(type, sourceConfig);
+			InputSource source = InputSourceFactory.makeInputSource(sourceType, sourceConfig);
 			if (source == null)
-				throw new ConfigurationException("Unknown input source type \""+type+"\"");
+				throw new ConfigurationException("Unknown input source type \""+sourceType+"\"");
+			source.init();
+			
+			Tokenizer tokenizer = TokenizerFactory.makeTokenizer(tokenizerType, tokenizerConfig);
+			if (tokenizer == null)
+				throw new ConfigurationException("Unknown tokenizer type \""+tokenizer+"\"");
+			tokenizer.setColumns(source.getColumnNames());
+			source.setTokenizer(tokenizer);
+			
 			return source;
 		} catch (InputException e) {
 			throw new ConfigurationException("Error creating source: "+e.getMessage());
@@ -69,7 +92,7 @@ public class TaggerConfigBuilder {
 		
 	}
 	
-	protected static Map<String,String> getInputSourceConfig(String prefix, Configuration properties) {
+	protected static Map<String,String> getInputConfig(String prefix, Configuration properties) {
 		Map<String,String> sourceConfig = new HashMap<String,String>();
 		
 		for (Iterator<String> keysIter = properties.getKeys(prefix); keysIter.hasNext(); ) {

@@ -1,28 +1,36 @@
-<project name="AddressTagger" default="run">
+<project name="AddressTagger" default="run" xmlns:ivy="antlib:org.apache.ivy.ant">
 
-    <property name="src.dir"     value="src"/>
-    <property name="test.dir"    value="test"/>
-    <property name="lib.dir"     value="lib"/>
-    <property name="build.dir"   value="build"/>
-    <property name="classes.dir" value="${build.dir}/classes"/>
-    <property name="jar.dir"     value="${build.dir}/jar"/>
-    <property name="main-class"  value="com.grunick.addresstagger.AddressTaggerRunner"/>
+    <property name="src.dir"      value="src"/>
+    <property name="test.dir"     value="test"/>
+    <property name="lib.dir"      value="lib"/>
+    <property name="build.dir"    value="build"/>
+    <property name="classes.dir"  value="${build.dir}/classes"/>
+    <property name="jar.dir"      value="${build.dir}/jar"/>
+	<property name="ivy.lib.dir"  value="${build.dir}/lib"/>
+    <property name="ivy.jar.file" value="${lib.dir}/ivy-2.3.0.jar" />
+    <property name="main-class"   value="com.grunick.addresstagger.AddressTaggerRunner"/>
 
-    <target name="clean">
+    <target name="clean" >
         <delete dir="${build.dir}"/>
     </target>
 
-    <path id="src.libs">
-    	<fileset dir="lib" includes="*.jar"/>
-  	</path>
-    
-    <target name="compile">
+    <target name="compile" depends="clean,resolve">
         <mkdir dir="${classes.dir}"/>
-        <javac srcdir="${src.dir}" destdir="${classes.dir}">
-            <classpath refid="src.libs"/>
+        <javac includeantruntime="true" srcdir="${src.dir}" destdir="${classes.dir}">
+        	<classpath refid="ivy.lib.classpath"/>
         </javac>
     </target>
 
+    <target name="resolve">
+    	<mkdir dir="${ivy.lib.dir}"/>
+        <path id="ivy.lib.path">
+        	<pathelement location="${ivy.jar.file}"/>
+        </path>
+        <taskdef resource="org/apache/ivy/ant/antlib.xml" uri="antlib:org.apache.ivy.ant" classpathref="ivy.lib.path"/>    
+    	<ivy:retrieve pattern="${ivy.lib.dir}/[artifact]-[type]-[revision].[ext]" type="jar"/>
+    	<ivy:cachepath pathid="ivy.lib.classpath" />
+    </target>
+	
     <target name="jar" depends="compile">
         <mkdir dir="${jar.dir}"/>
         <jar destfile="${jar.dir}/${ant.project.name}.jar" basedir="${classes.dir}">
@@ -31,9 +39,18 @@
             </manifest>
         </jar>
     </target>
+	
+	<path id="project.class.path">  
+	    <fileset dir="${ivy.lib.dir}">
+	    	<include name="**/*.jar" />
+	    </fileset>
+		<pathelement location="${classes.dir}"/> 
+	</path>  
 
-    <target name="run" depends="jar">
-        <java jar="${jar.dir}/${ant.project.name}.jar" fork="true"/>
+    <target name="run" depends="compile">
+        <java classname="${main-class}">
+        	<classpath refid="project.class.path" />
+        </java>
     </target>
 
 </project>

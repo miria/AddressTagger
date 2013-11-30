@@ -1,15 +1,16 @@
 package com.grunick.addresstagger.strategy;
 
 import com.grunick.addresstagger.config.TaggerConfig;
+import com.grunick.addresstagger.input.InputConstants.StrategyTypes;
 
 public class TaggerStrategyFactory {
 
 	private TaggerStrategyFactory() {}
 	
 	public static TaggerStrategy makeStrategy(String type, TaggerConfig config) {
-		if ("maximumLikelihood".equalsIgnoreCase(type))
+		if (StrategyTypes.MAX_LIKELIHOOD_STRATEGY.equalsIgnoreCase(type))
 			return new MaximumLikelihoodStrategy();
-		if ("noop".equalsIgnoreCase(type))
+		if (StrategyTypes.NO_OP_STRATEGY.equalsIgnoreCase(type))
 			return new NoOpTaggerStrategy();
 		return null;
 	}

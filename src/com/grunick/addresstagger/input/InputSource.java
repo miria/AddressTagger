@@ -5,6 +5,7 @@ import java.util.Map;
 
 import com.grunick.addresstagger.data.Address;
 import com.grunick.addresstagger.data.AddressTag;
+import com.grunick.addresstagger.tokenize.Tokenizer;
 
 public interface InputSource {
 		
@@ -21,5 +22,7 @@ public interface InputSource {
 	public List<String> getColumnNames();
 	
 	public Map<String, AddressTag> getColumnToTagMap();
+	
+	public void setTokenizer(Tokenizer tokenizer);
 
 }

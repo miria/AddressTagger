@@ -42,4 +42,12 @@ public class Counter<T> {
 	    }
 	    return maxValue;
 	}
+	
+	public Map<T, Double> getProbabilityMap() {
+		Map<T, Double> probMap = new HashMap<T, Double>();
+		for (T item : counterMap.keySet()) {
+			probMap.put(item, (double)counterMap.get(item)/(double)total);
+		}
+		return Collections.unmodifiableMap(probMap);
+	}
 }

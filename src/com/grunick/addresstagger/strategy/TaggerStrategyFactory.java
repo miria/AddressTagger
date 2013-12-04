@@ -12,6 +12,8 @@ public class TaggerStrategyFactory {
 			return new MostFrequentTagStrategy();
 		if (StrategyTypes.NO_OP_STRATEGY.equalsIgnoreCase(type))
 			return new NoOpTaggerStrategy();
+		if (StrategyTypes.HMM_BIGRAM_STRATEGY.equalsIgnoreCase(type))
+			return new HMMBigramStrategy();
 		return null;
 	}
 }

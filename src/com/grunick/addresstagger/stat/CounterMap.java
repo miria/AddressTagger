@@ -1,5 +1,6 @@
 package com.grunick.addresstagger.stat;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -19,6 +20,15 @@ public class CounterMap<T,U> {
 	
 	public boolean containsKey(T term) {
 		return counterMap.containsKey(term);
+	}
+	
+	public Map<T, Map<U, Double>> getProbabilityMaps() {
+		Map<T, Map<U,Double>> probMap = new HashMap<T, Map<U, Double>>();
+		for (T item : counterMap.keySet()) {
+			probMap.put(item, counterMap.get(item).getProbabilityMap());
+		}
+		
+		return Collections.unmodifiableMap(probMap);
 	}
 	
 	

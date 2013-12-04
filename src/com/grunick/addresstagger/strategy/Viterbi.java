@@ -54,18 +54,18 @@ public class Viterbi<S, O> {
 	// TODO: Better unknown state model
 	protected double getTransitionProb(S state1, S state2) {
 		if (!transProb.containsKey(state1))
-			return 0.0;
+			return 0.0000001;
 		if (!transProb.get(state1).containsKey(state2))
-			return 0.0;
+			return 0.0000001;
 		return transProb.get(state1).get(state2);
 	}
 
 	// TODO: Better unknown term model
 	protected double getEmissionProb(S state, O observation) {
 		if (!emProb.containsKey(state))
-			return 0.0;
+			return 0.0000001;
 		if (!emProb.get(state).containsKey(observation))
-			return 0.0;
+			return 0.0000001;
 		return emProb.get(state).get(observation);
 	}
 
@@ -87,9 +87,9 @@ public class Viterbi<S, O> {
 			O obs = observations.get(i);
 			HashMap<S, ViterbiNode> nextStates = new HashMap<S, ViterbiNode>();
 			for (S next : knownStates) {
-				double stateTotal = 0;
+				double stateTotal = 0.0;
 				S maxArg = null;
-				double stateMax = 0;
+				double stateMax = 0.0;
 
 				for (S previous : knownStates) {
 					ViterbiNode node = stateMap.get(previous);
@@ -102,19 +102,39 @@ public class Viterbi<S, O> {
 						stateMax = totalProb;
 					}
 				}
-				nextStates.put(next, new ViterbiNode(stateTotal, maxArg, stateMax));
+				nextStates.put(next, new ViterbiNode(stateTotal, maxArg, stateMax)); 
 				
 			}
 			backPointer.add(nextStates);
 			stateMap = nextStates;
 		}
 		
+		// Termination step
+		HashMap<S, ViterbiNode> nextStates = new HashMap<S, ViterbiNode>();
+		double stateTotal = 0.0;
+		S maxArg = null;
+		double stateMax = 0.0;
+
+		for (S previous : knownStates) {
+			ViterbiNode node = stateMap.get(previous);
+			double totalProb = node.getTotalScore() * getTransitionProb(previous, stopState);
+			stateTotal += totalProb;
+			if (totalProb > stateMax) {
+				maxArg = previous;
+				stateMax = totalProb;
+			}
+		}
+		nextStates.put(stopState, new ViterbiNode(stateTotal, maxArg, stateMax));
+
+		backPointer.add(nextStates);
+		stateMap = nextStates;
+		
 		List<S> maxStates = new ArrayList<S>();
 		S nextState = stopState;
 		
-		
 		// Destroy the backpointer to get the list...
 		while (backPointer.size() > 0) {
+			
 			maxStates.add(0, nextState);
 			Map<S,ViterbiNode>nodes = backPointer.remove(backPointer.size()-1);
 			ViterbiNode max = nodes.get(nextState);

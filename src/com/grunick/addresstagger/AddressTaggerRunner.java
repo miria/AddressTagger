@@ -65,6 +65,7 @@ public class AddressTaggerRunner {
 				System.out.println("----------------------------------------");
 			}
 		}
+		
 		return scorer.getOverallScore();
 
 	}

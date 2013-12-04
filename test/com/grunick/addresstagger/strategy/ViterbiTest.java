@@ -59,9 +59,9 @@ public class ViterbiTest {
 		Map<String, Map<String,Double>> transmission = getTransmissionProbabilities();
 		Map<String, Map<String,Double>> emission  = getEmissionProbabilities();
 		
-		Viterbi viterbi = new Viterbi(transmission, emission, states, "Start", "Fever");
+		Viterbi<String,String> viterbi = new Viterbi<String,String>(transmission, emission, states, "Start", "Fever");
 		List<String> bestPath = viterbi.findMaxStates(observations);
-		assertEquals(bestPath, Arrays.asList(new String[] {"Healthy", "Healthy", "Fever"}));
+		assertEquals(bestPath, Arrays.asList(new String[] {"Healthy", "Healthy", "Fever", "Fever"}));
 
 
 	}
@@ -74,9 +74,9 @@ public class ViterbiTest {
 		Map<String, Map<String,Double>> transmission = getTransmissionProbabilities();
 		Map<String, Map<String,Double>> emission  = getEmissionProbabilities();
 		
-		Viterbi viterbi = new Viterbi(transmission, emission, states, "Start", "Healthy");
+		Viterbi<String,String> viterbi = new Viterbi<String,String>(transmission, emission, states, "Start", "Healthy");
 		List<String> bestPath = viterbi.findMaxStates(observations);
-		assertEquals(bestPath, Arrays.asList(new String[] {"Healthy", "Healthy", "Healthy"}));
+		assertEquals(bestPath, Arrays.asList(new String[] {"Healthy", "Healthy", "Fever","Healthy"}));
 
 	}
 

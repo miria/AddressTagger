@@ -14,7 +14,7 @@ import com.grunick.addresstagger.stat.CounterMap;
  * @author miria
  *
  */
-public class MostFrequentTagStrategy implements TaggerStrategy {
+public class MostLikelyTagStrategy implements TaggerStrategy {
 	
 	protected CounterMap<String, AddressTag> counters = new CounterMap<String, AddressTag>();
 	protected Counter<AddressTag> unknownTermTags = new Counter<AddressTag>();

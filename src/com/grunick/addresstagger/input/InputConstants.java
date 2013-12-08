@@ -31,7 +31,9 @@ public class InputConstants {
 
 	public static class StrategyTypes {
 		public static final String NO_OP_STRATEGY= "noop";
-		public static final String MOST_FREQUENT_STRATEGY = "mostFrequent";
+		public static final String MOST_LIKELY_TAG_STRATEGY = "mostFrequent";
 		public static final String HMM_BIGRAM_STRATEGY = "HMMBigram";
+		public static final String HMM_TRIGRAM_STRATEGY = "HMMTrigram";
+		public static final String MEMM_STRATEGY = "MEMM";
 	}
 }

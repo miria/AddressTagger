@@ -32,9 +32,9 @@ public class AddressTaggerRunner {
 		
 		if (config.runTestMode()) {
 			System.out.println("Tagging the test data....");
-
-			double accuracy = executeBatch(config.getTestData(), config.isVerbose());
+			
 			System.out.println("-------------------------------");
+			double accuracy = executeBatch(config.getTestData(), config.isVerbose());
 			System.out.println("Overall accuracy: "+accuracy);
 			System.out.println("-------------------------------");
 		}
@@ -53,10 +53,13 @@ public class AddressTaggerRunner {
 			} catch (InputException ie) {
 				continue;
 			}
+			
 			tagger.tagAddress(address);
 			double score = scorer.scoreResult(address);
+			
+			counter++;
 			if (verbose) {
-				System.out.println("Index:    "+counter++);
+				System.out.println("Index:    "+counter);
 				System.out.println("Address:  "+address.getFullName());
 				System.out.println("Tokens:   "+address.getAddressTokens());
 				System.out.println("Guess:    "+address.getGuessedTags());
@@ -64,8 +67,11 @@ public class AddressTaggerRunner {
 				System.out.println("Accuracy: "+score);
 				System.out.println("----------------------------------------");
 			}
+			//if (counter % 1000 == 0)
+			//	System.out.println("Tagged "+counter+" current accuracy = "+scorer.getOverallScore());
 		}
 		
+		System.out.println("Tagged "+counter+" addresses");
 		return scorer.getOverallScore();
 
 	}

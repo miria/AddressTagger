@@ -85,10 +85,17 @@ public class TaggerConfigBuilder {
 	
 	protected static TaggerStrategy loadStrategy(Configuration properties, TaggerConfig config) throws ConfigurationException {
 		String type = properties.getString("strategy");
-		TaggerStrategy strategy = TaggerStrategyFactory.makeStrategy(type, config);
-		if (strategy == null)
-			throw new ConfigurationException("Unknown tagger strategy \""+type+"\"");
-		return strategy;
+		Map<String,String> strategyConfig = getInputConfig("strategy.", properties);
+		TaggerStrategy strategy;
+		try {
+			strategy = TaggerStrategyFactory.makeStrategy(type, strategyConfig);
+			if (strategy == null)
+				throw new ConfigurationException("Unknown tagger strategy \""+type+"\"");
+			return strategy;
+		} catch (InputException e) {
+			throw new ConfigurationException("Error creating strategy: "+e.getMessage());
+		}
+
 		
 	}
 	

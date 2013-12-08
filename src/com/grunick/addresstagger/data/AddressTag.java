@@ -13,6 +13,6 @@ public enum AddressTag {
 	NUM,    /* Street/House number */
 	ZIP,    /* Postal Code */
 	UNK,    /* Unknown token */
-	START,  /* Used for HMMs */
-	STOP    /* Used for HMMs */
+	START,  /* Used for Markov chains */
+	STOP    /* Used for Markov chains */
 }

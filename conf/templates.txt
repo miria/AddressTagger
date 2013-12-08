@@ -1,0 +1,26 @@
+A -> B tag C @ [ -1 ] .
+A -> B tag C @ [ 1 ] .
+A -> B tag C @ [ -2 ] .
+A -> B tag C @ [ 2 ] .
+A -> B tag C @ [ -1 -2 ] .
+A -> B tag C @ [ 1 2 ] .
+A -> B tag C @ [ -1 -2 -3 ] .
+A -> B tag C @ [ 1 2 3 ] .
+A -> B tag C @ [ -1 ] & tag D @ [ 1 ] .
+A -> B tag C @ [ -1 ] & tag D @ [ -2 ] .
+A -> B tag C @ [ 1 ] & tag D @ [ 2 ] .
+A -> B word C @ [ 0 ] & tag D @ [ -1 ] .
+A -> B word C @ [ 0 ] & tag D @ [ 1 ] .
+A -> B word C @ [ 0 ] & tag D @ [ -2 ] .
+A -> B word C @ [ 0 ] & tag D @ [ 2 ] .
+A -> B word C @ [ -1 ] .
+A -> B word C @ [ 1 ] .
+A -> B word C @ [ -2 ] .
+A -> B word C @ [ 2 ] .
+A -> B word C @ [ -1 -2 ] .
+A -> B word C @ [ 1 2 ] .
+A -> B word C @ [ 0 ] .
+A -> B word C @ [ 0 ] & word D @ [ -2 ] .
+A -> B word C @ [ 0 ] & word D @ [ -1 ] .
+A -> B word C @ [ 0 ] & word D @ [ 1 ] .
+A -> B word C @ [ 0 ] & word D @ [ 2 ] .

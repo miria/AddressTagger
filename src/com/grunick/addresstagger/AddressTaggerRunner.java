@@ -5,6 +5,7 @@ import org.apache.commons.configuration.ConfigurationException;
 import com.grunick.addresstagger.config.TaggerConfig;
 import com.grunick.addresstagger.config.TaggerConfigBuilder;
 import com.grunick.addresstagger.data.Address;
+import com.grunick.addresstagger.evaluate.AccuracyScorer;
 import com.grunick.addresstagger.input.InputException;
 import com.grunick.addresstagger.input.InputSource;
 

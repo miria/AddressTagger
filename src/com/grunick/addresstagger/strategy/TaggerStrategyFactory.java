@@ -23,6 +23,8 @@ public class TaggerStrategyFactory {
 			return new HMMTrigramStrategy();
 		if (StrategyTypes.MEMM_STRATEGY.equalsIgnoreCase(type))
 			return getMEMMStrategy(strategyConfig);
+		if (StrategyTypes.TBL_STRATEGY.equalsIgnoreCase(type))
+			return getTBLStrategy(strategyConfig);
 		return null;
 	}
 	
@@ -38,5 +40,29 @@ public class TaggerStrategyFactory {
 		int iterations = InputUtils.parseInt(config, StrategyConfig.ITERATIONS);
 		return new MEMMStrategy(entropyFile, persistFile, iterations, cutoff);
 		
+	}
+	
+	public static TBLStrategy getTBLStrategy(Map<String,String> config) throws InputException {
+		if (!config.containsKey(StrategyConfig.GUESSER_FILE))
+			throw new InputException("Undefined guesser file!");
+		String guesserFile = config.get(StrategyConfig.GUESSER_FILE);
+		
+		if (!config.containsKey(StrategyConfig.RULE_FILE))
+			throw new InputException("Undefined rule file!");
+		String ruleFile = config.get(StrategyConfig.RULE_FILE);
+		
+		if (!config.containsKey(StrategyConfig.LEX_FILE))
+			throw new InputException("Undefined lex file!");
+		String lexFile = config.get(StrategyConfig.LEX_FILE);
+		
+		if (!config.containsKey(StrategyConfig.TEMPLATE_FILE))
+			throw new InputException("Undefined template file!");
+		String templateFile = config.get(StrategyConfig.TEMPLATE_FILE);
+		
+		if (!config.containsKey(StrategyConfig.CORPUS_FILE))
+			throw new InputException("Undefined corpus file!");
+		String corpusFile = config.get(StrategyConfig.CORPUS_FILE);
+		
+		return new TBLStrategy(corpusFile, templateFile, ruleFile, lexFile, guesserFile);
 	}
 }

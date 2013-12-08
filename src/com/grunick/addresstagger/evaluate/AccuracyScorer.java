@@ -1,4 +1,4 @@
-package com.grunick.addresstagger;
+package com.grunick.addresstagger.evaluate;
 
 import com.grunick.addresstagger.data.Address;
 import com.grunick.addresstagger.data.AddressTag;

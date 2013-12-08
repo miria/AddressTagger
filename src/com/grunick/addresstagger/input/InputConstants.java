@@ -36,4 +36,11 @@ public class InputConstants {
 		public static final String HMM_TRIGRAM_STRATEGY = "HMMTrigram";
 		public static final String MEMM_STRATEGY = "MEMM";
 	}
+	
+	public static class StrategyConfig {
+		public static final String PERSIST_FILE = "persist_file";
+		public static final String ENTROPY_FILE = "entropy_file";
+		public static final String CUTOFF = "cutoff";
+		public static final String ITERATIONS = "iterations";
+	}
 }

@@ -1,8 +1,6 @@
 package com.grunick.addresstagger.strategy;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -15,8 +13,6 @@ import com.grunick.addresstagger.stat.CounterMap;
 
 public class HMMTrigramStrategy implements TaggerStrategy {
 
-	EnumSet<AddressTag> values = EnumSet.allOf(AddressTag.class);
-	List<AddressTag> knownStates = Arrays.asList(values.toArray(new AddressTag[] {}));
 	private Map<String, Map<AddressTag, Double>> bigramTransProb;
 	private Map<String, Map<AddressTag, Double>> trigramTransProb;
 
@@ -91,7 +87,7 @@ public class HMMTrigramStrategy implements TaggerStrategy {
 		// Initialization step
 		Map<String, ViterbiNode<String>> stateMap = new HashMap<String, ViterbiNode<String>>();
 		List<Map<String, ViterbiNode<String>>> backPointer = new ArrayList<Map<String, ViterbiNode<String>>>();
-		for (AddressTag state : knownStates) {
+		for (AddressTag state : AddressTag.values()) {
 			double prob = getTransitionProb(null, AddressTag.START, state) * getEmissionProb(state, observations.get(0));
 			String key = getTrigramKey(AddressTag.START,state);
 			stateMap.put(key, new ViterbiNode<String>(prob, key, prob));
@@ -102,14 +98,14 @@ public class HMMTrigramStrategy implements TaggerStrategy {
 		for (int i=1; i < observations.size(); i++) {
 			String obs = observations.get(i);
 			HashMap<String, ViterbiNode<String>> nextStates = new HashMap<String, ViterbiNode<String>>();
-			for (AddressTag next : knownStates) {
+			for (AddressTag next : AddressTag.values()) {
 
 
-				for (AddressTag previous : knownStates) {
+				for (AddressTag previous : AddressTag.values()) {
 					double stateTotal = 0.0;
 					String maxArg = null;
 					double stateMax = 0.0;
-					for (AddressTag prevPrevious : knownStates ) {
+					for (AddressTag prevPrevious : AddressTag.values() ) {
 						String key = getTrigramKey(prevPrevious, previous);
 						ViterbiNode<String> node = stateMap.get(key);
 						if (node == null)
@@ -137,9 +133,9 @@ public class HMMTrigramStrategy implements TaggerStrategy {
 		String maxArg = null;
 		double stateMax = 0.0;
 
-		for (AddressTag previous : knownStates) {
+		for (AddressTag previous : AddressTag.values()) {
 
-			for (AddressTag prevPrevious : knownStates) {
+			for (AddressTag prevPrevious : AddressTag.values()) {
 				String key = getTrigramKey(prevPrevious, previous);
 				ViterbiNode<String> node = stateMap.get(key);
 				if (node == null)

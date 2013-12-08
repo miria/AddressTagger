@@ -1,8 +1,6 @@
 package com.grunick.addresstagger.strategy;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -15,8 +13,6 @@ import com.grunick.addresstagger.stat.CounterMap;
 
 public class HMMBigramStrategy implements TaggerStrategy {
 	
-	EnumSet<AddressTag> values = EnumSet.allOf(AddressTag.class);
-	List<AddressTag> knownStates = Arrays.asList(values.toArray(new AddressTag[] {}));
 	private Map<AddressTag, Map<AddressTag, Double>> transProb;
 	private Map<AddressTag, Map<String, Double>> emProb;
 	
@@ -41,7 +37,7 @@ public class HMMBigramStrategy implements TaggerStrategy {
 		// Initialization step
 		Map<AddressTag, ViterbiNode<AddressTag>> stateMap = new HashMap<AddressTag, ViterbiNode<AddressTag>>();
 		List<Map<AddressTag, ViterbiNode<AddressTag>>> backPointer = new ArrayList<Map<AddressTag, ViterbiNode<AddressTag>>>();
-		for (AddressTag state : knownStates) {
+		for (AddressTag state : AddressTag.values()) {
 			double prob = getTransitionProb(AddressTag.START, state) * getEmissionProb(state, observations.get(0));
 			stateMap.put(state, new ViterbiNode<AddressTag>(prob, state, prob));
 		}
@@ -51,12 +47,12 @@ public class HMMBigramStrategy implements TaggerStrategy {
 		for (int i=1; i < observations.size(); i++) {
 			String obs = observations.get(i);
 			HashMap<AddressTag, ViterbiNode<AddressTag>> nextStates = new HashMap<AddressTag, ViterbiNode<AddressTag>>();
-			for (AddressTag next : knownStates) {
+			for (AddressTag next : AddressTag.values()) {
 				double stateTotal = 0.0;
 				AddressTag maxArg = null;
 				double stateMax = 0.0;
 
-				for (AddressTag previous : knownStates) {
+				for (AddressTag previous : AddressTag.values()) {
 					ViterbiNode<AddressTag> node = stateMap.get(previous);
 
 					double curProb = getEmissionProb(next, obs) * getTransitionProb(previous, next);
@@ -80,7 +76,7 @@ public class HMMBigramStrategy implements TaggerStrategy {
 		AddressTag maxArg = null;
 		double stateMax = 0.0;
 
-		for (AddressTag previous : knownStates) {
+		for (AddressTag previous : AddressTag.values()) {
 			ViterbiNode<AddressTag> node = stateMap.get(previous);
 			double totalProb = node.getTotalScore() * getTransitionProb(previous, AddressTag.STOP);
 			stateTotal += totalProb;

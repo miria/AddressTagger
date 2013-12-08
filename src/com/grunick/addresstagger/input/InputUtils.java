@@ -14,5 +14,13 @@ public class InputUtils {
 			throw new InputException("Missing config value for input source: \""+fieldName+"\"");
 		return field;
 	}
+	
+	public static int parseInt(Map<String, String> config, String fieldName) throws InputException {
+		try {
+			return Integer.parseInt(config.get(fieldName));
+		} catch (NumberFormatException e) {
+			throw new InputException("Invalid integer value for \""+fieldName+"\"");
+		}
+	}
 
 }

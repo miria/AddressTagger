@@ -13,9 +13,12 @@ public class AddressTaggerRunner {
 	private static AddressTagger tagger;
 
 	public static void main(String[] args) throws ConfigurationException, InputException {
+		if (args.length < 1)
+			throw new RuntimeException("Missing config file argument!");
+		String configFile = args[0];
 		// TODO: pass config in via command line...
 		System.out.println("Loading configuration....");
-		TaggerConfig config = TaggerConfigBuilder.loadConfiguration("/Users/miria/git/AddressTagger/conf/tagger.properties");
+		TaggerConfig config = TaggerConfigBuilder.loadConfiguration(configFile);
 		tagger = new AddressTagger(config);
 		
 		System.out.println("Training the address tagger....");

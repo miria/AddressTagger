@@ -85,7 +85,7 @@ public class TaggerConfigBuilder {
 	
 	protected static TaggerStrategy loadStrategy(Configuration properties, TaggerConfig config) throws ConfigurationException {
 		String type = properties.getString("strategy");
-		Map<String,String> strategyConfig = getInputConfig("strategy.", properties);
+		Map<String,String> strategyConfig = getInputConfig("strategy.conf", properties);
 		TaggerStrategy strategy;
 		try {
 			strategy = TaggerStrategyFactory.makeStrategy(type, strategyConfig);

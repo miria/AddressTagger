@@ -3,8 +3,10 @@ package com.grunick.addresstagger.strategy;
 import java.io.File;
 import java.util.Map;
 
+import com.grunick.addresstagger.input.InputConstants.StrategyConfig;
 import com.grunick.addresstagger.input.InputConstants.StrategyTypes;
 import com.grunick.addresstagger.input.InputException;
+import com.grunick.addresstagger.input.InputUtils;
 
 public class TaggerStrategyFactory {
 
@@ -25,14 +27,16 @@ public class TaggerStrategyFactory {
 	}
 	
 	
-	public static MEMMStrategy getMEMMStrategy(Map<String,String> strategyConfig) throws InputException {
-		File persistFile = new File(strategyConfig.get("persistFile"));
-		if (!persistFile.canWrite())
-			throw new InputException("Invalid persist file!");
-		File entropyFile = new File(strategyConfig.get("entropyFile"));
-		if (!entropyFile.canWrite())
-			throw new InputException("Invalid entropy file!");
-		return new MEMMStrategy(entropyFile, persistFile);
+	public static MEMMStrategy getMEMMStrategy(Map<String,String> config) throws InputException {
+		if (!config.containsKey(StrategyConfig.PERSIST_FILE))
+			throw new InputException("Undefined persist file!");
+		File persistFile = new File(config.get(StrategyConfig.PERSIST_FILE));
+		if (!config.containsKey(StrategyConfig.ENTROPY_FILE))
+			throw new InputException("Undefined entropy file!");
+		File entropyFile = new File(config.get(StrategyConfig.ENTROPY_FILE));
+		int cutoff = InputUtils.parseInt(config, StrategyConfig.CUTOFF);
+		int iterations = InputUtils.parseInt(config, StrategyConfig.ITERATIONS);
+		return new MEMMStrategy(entropyFile, persistFile, iterations, cutoff);
 		
 	}
 }

@@ -1,7 +1,10 @@
 package com.grunick.addresstagger.strategy;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.util.Map;
+import java.util.Properties;
 
 import com.grunick.addresstagger.input.InputConstants.StrategyConfig;
 import com.grunick.addresstagger.input.InputConstants.StrategyTypes;
@@ -25,6 +28,8 @@ public class TaggerStrategyFactory {
 			return getMEMMStrategy(strategyConfig);
 		if (StrategyTypes.TBL_STRATEGY.equalsIgnoreCase(type))
 			return getTBLStrategy(strategyConfig);
+		if (StrategyTypes.CRF_STRATEGY.equalsIgnoreCase(type))
+			return new CRFStrategy();
 		return null;
 	}
 	
@@ -65,4 +70,5 @@ public class TaggerStrategyFactory {
 		
 		return new TBLStrategy(corpusFile, templateFile, ruleFile, lexFile, guesserFile);
 	}
+	
 }

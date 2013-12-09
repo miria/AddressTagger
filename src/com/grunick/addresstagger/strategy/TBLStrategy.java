@@ -36,7 +36,7 @@ public class TBLStrategy implements TaggerStrategy {
 		
 		BufferedWriter writer;
 		try {
-			writer = new BufferedWriter(new FileWriter(new File(corpusFile)));
+			writer = new BufferedWriter(new FileWriter(new File(corpusFile), false));
 		} catch (IOException e) {
 			throw new InputException("Unable to generate the corpus file! "+e.getMessage());
 		}
@@ -56,6 +56,12 @@ public class TBLStrategy implements TaggerStrategy {
 				throw new InputException("Unable to generate the corpus file! "+e.getMessage());
 			} catch (InputException ie) {}
 			
+		}
+		
+		try {
+			writer.close();
+		} catch (IOException e) {
+			throw new InputException("Unable to generate the training file! "+e.getMessage());
 		}
 		
 		TblTrainer trainer = new TblTrainer(lexFile, corpusFile);

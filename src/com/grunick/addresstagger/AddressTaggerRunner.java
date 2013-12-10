@@ -1,11 +1,17 @@
 package com.grunick.addresstagger;
 
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+
 import org.apache.commons.configuration.ConfigurationException;
 
 import com.grunick.addresstagger.config.TaggerConfig;
 import com.grunick.addresstagger.config.TaggerConfigBuilder;
 import com.grunick.addresstagger.data.Address;
 import com.grunick.addresstagger.evaluate.AccuracyScorer;
+import com.grunick.addresstagger.evaluate.Scorer;
+import com.grunick.addresstagger.evaluate.UnknownWordAccuracyScorer;
 import com.grunick.addresstagger.input.InputException;
 import com.grunick.addresstagger.input.InputSource;
 
@@ -28,7 +34,7 @@ public class AddressTaggerRunner {
 		if (config.runValidationMode()) {
 			System.out.println("Tagging the validation data....");
 
-			double accuracy = executeBatch(config.getValidationData(), config.isVerbose());
+			double accuracy = executeBatch(config.getValidationData(), config.getTrainingData(), config.isVerbose());
 			System.out.println("-------------------------------");
 			System.out.println("Overall accuracy: "+accuracy);
 			System.out.println("-------------------------------");
@@ -38,7 +44,7 @@ public class AddressTaggerRunner {
 			System.out.println("Tagging the test data....");
 			
 			System.out.println("-------------------------------");
-			double accuracy = executeBatch(config.getTestData(), config.isVerbose());
+			double accuracy = executeBatch(config.getTestData(), config.getTrainingData(), config.isVerbose());
 			System.out.println("Overall accuracy: "+accuracy);
 			System.out.println("-------------------------------");
 		}
@@ -47,9 +53,23 @@ public class AddressTaggerRunner {
 
 	}
 	
-	protected static double executeBatch(InputSource source,  boolean verbose) {
-		AccuracyScorer scorer = new AccuracyScorer();
+	protected static double executeBatch(InputSource source, InputSource train,  boolean verbose) throws InputException {
+		Scorer scorer = new AccuracyScorer();
 		int counter = 0;
+		HashSet<String> knownTerms = new HashSet<String>();
+		train.reset();
+		while (train.hasNext()) {
+			Address address;
+			try {
+				address = train.getNext();
+				knownTerms.addAll(address.getAddressTokens());
+			} catch (InputException ie) {
+				continue;
+			}
+		}
+		Scorer unknownScorer = new UnknownWordAccuracyScorer(knownTerms);
+		
+
 		while (source.hasNext()) {
 			Address address;
 			try {
@@ -60,6 +80,7 @@ public class AddressTaggerRunner {
 			
 			tagger.tagAddress(address);
 			double score = scorer.scoreResult(address);
+			unknownScorer.scoreResult(address);
 			
 			counter++;
 			if (verbose) {
@@ -71,11 +92,13 @@ public class AddressTaggerRunner {
 				System.out.println("Accuracy: "+score);
 				System.out.println("----------------------------------------");
 			}
-			//if (counter % 1000 == 0)
-			//	System.out.println("Tagged "+counter+" current accuracy = "+scorer.getOverallScore());
+			if (counter % 10000 == 0)
+				System.out.println("Tagged "+counter+" current accuracy = "+scorer.getOverallScore());
 		}
 		
 		System.out.println("Tagged "+counter+" addresses");
+		System.out.println("Unknown accuracy: "+unknownScorer.getOverallScore());
+
 		return scorer.getOverallScore();
 
 	}

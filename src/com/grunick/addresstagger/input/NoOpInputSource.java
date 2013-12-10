@@ -43,4 +43,9 @@ public class NoOpInputSource implements InputSource {
 	public void setTokenizer(Tokenizer tokenizer) {		
 	}
 
+	@Override
+	public void reset() {
+		
+	}
+
 }

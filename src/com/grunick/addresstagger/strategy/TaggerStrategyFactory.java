@@ -1,10 +1,7 @@
 package com.grunick.addresstagger.strategy;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
 import java.util.Map;
-import java.util.Properties;
 
 import com.grunick.addresstagger.input.InputConstants.StrategyConfig;
 import com.grunick.addresstagger.input.InputConstants.StrategyTypes;

@@ -22,5 +22,7 @@ public interface InputSource {
 	public Map<String, AddressTag> getColumnToTagMap();
 	
 	public void setTokenizer(Tokenizer tokenizer);
+	
+	public void reset() throws InputException;
 
 }

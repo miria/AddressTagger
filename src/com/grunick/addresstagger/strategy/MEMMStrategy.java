@@ -15,6 +15,8 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.apache.commons.lang.StringUtils;
+
 import opennlp.maxent.BasicEventStream;
 import opennlp.maxent.GIS;
 import opennlp.maxent.GISModel;
@@ -61,9 +63,8 @@ public class MEMMStrategy implements TaggerStrategy {
 					if (address.size() == 0)
 						continue;
 
-					List<String> lines = encodeAddress(address, null); 
-					for (String line : lines) {
-						writer.write(line);
+					for (int i=0; i<address.size(); i++) {
+						writer.write(encodeAddress(address, i, null, null));
 						writer.newLine();
 					}
 
@@ -102,7 +103,7 @@ public class MEMMStrategy implements TaggerStrategy {
 		Map<AddressTag, ViterbiNode<AddressTag>> stateMap = new HashMap<AddressTag, ViterbiNode<AddressTag>>();
 		List<Map<AddressTag, ViterbiNode<AddressTag>>> backPointer = new ArrayList<Map<AddressTag, ViterbiNode<AddressTag>>>();
 		for (AddressTag state : AddressTag.values()) {
-			double prob = predict(address, 0, state.toString());   
+			double prob = predict(address, 0, state.toString(), AddressTag.START.toString());   
 			stateMap.put(state, new ViterbiNode<AddressTag>(prob, state, prob));
 		}
 		backPointer.add(stateMap);
@@ -118,7 +119,7 @@ public class MEMMStrategy implements TaggerStrategy {
 				for (AddressTag previous : AddressTag.values()) {
 					ViterbiNode<AddressTag> node = stateMap.get(previous);
 
-					double totalProb = node.getTotalScore() * predict(address, i, next.toString());
+					double totalProb = node.getTotalScore() * predict(address, i, next.toString(), previous.toString());
 					stateTotal += totalProb;
 					if (totalProb > stateMax) {
 						maxArg = previous;
@@ -140,7 +141,7 @@ public class MEMMStrategy implements TaggerStrategy {
 
 		for (AddressTag previous : AddressTag.values()) {
 			ViterbiNode<AddressTag> node = stateMap.get(previous);
-			double totalProb = node.getTotalScore() * predict(address, observations.size()-1, previous.toString());
+			double totalProb = node.getTotalScore() * predict(address, observations.size()-1, previous.toString(), AddressTag.STOP.toString());
 			stateTotal += totalProb;
 			if (totalProb > stateMax) {
 				maxArg = previous;
@@ -167,30 +168,43 @@ public class MEMMStrategy implements TaggerStrategy {
 	}
 
 	
-	protected List<String> encodeAddress(Address address, String prediction) {
-		List<String> terms = new ArrayList<String>();
-		List<String> tokens = address.getAddressTokens();
-		for (int i=0; i < address.size(); i++) {
-			String text = tokens.get(i).trim();
+	protected String encodeAddress(Address address, int idx, String prediction, String prevPrediction) {
+
+			String text = address.getAddressTokens().get(idx).trim();
 			
 			StringBuilder builder = new StringBuilder();
 
 			builder.append("current=").append(text);
+			
+			builder.append(" prev=").append(idx==0?null:address.getAddressTokens().get(idx-1).trim());
+			builder.append(" next=").append(idx>=(address.size()-1)?null: address.getAddressTokens().get(idx+1).trim());
+			
+			builder.append(" first=").append(idx==0);
+			builder.append(" last=").append(idx==(address.size()-1));
+			
+			builder.append(" length=").append(text.length());
+			
+
+			if (prevPrediction == null && idx == 0)
+				builder.append(" prevtag=").append(AddressTag.START.toString());
+			else if (prevPrediction == null)
+				builder.append(" prevtag=").append(address.getKnownTags().get(idx-1).toString());
+			else
+				builder.append(" prevtag=").append(prevPrediction);
 
 			if (prediction == null) // training set
-				builder.append(" tag=").append(address.getKnownTags().get(i).toString());
+				builder.append(" curtag=").append(address.getKnownTags().get(idx).toString());
 			else
-				builder.append(" tag="+prediction);
-			terms.add(builder.toString());
-		}
-		return terms;
+				builder.append(" curtag="+prediction);
+
+		return builder.toString();
 		
 	}
 	
 	// TODO: Better unknown word model?
-	public double predict(Address address, int idx, String prediction) {
-		List<String> lines = encodeAddress(address, prediction);
-		double[] outcomes = maxent.eval(lines.get(idx).trim().split(" "));
+	public double predict(Address address, int idx, String prediction, String prevPrediction) {
+		String line = encodeAddress(address, idx, prediction, prevPrediction);
+		double[] outcomes = maxent.eval(line.trim().split(" "));
 		Map<String,Double> types = parseOutcomes(maxent.getAllOutcomes(outcomes));
 		return types.containsKey(prediction) ? types.get(prediction) : 0.0000001;
 	}

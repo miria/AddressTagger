@@ -98,4 +98,10 @@ public class FileInputSource implements InputSource {
 		
 	}
 
+	@Override
+	public void reset() throws InputException {
+		close();
+		init();
+	}
+
 }

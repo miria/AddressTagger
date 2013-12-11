@@ -35,7 +35,6 @@ public class UnknownWordAccuracyScorer implements Scorer {
 	}
 	
 	public String getOverallScore() {
-		System.out.println("global c "+globalCorrect+" global t "+ globalTotal);
-		return "Overall unknown word accuracy: "+((double)globalCorrect) / ((double)globalTotal);
+		return "Overall unknown word accuracy over "+globalTotal+" unknown words: "+((double)globalCorrect) / ((double)globalTotal);
 	}
 }

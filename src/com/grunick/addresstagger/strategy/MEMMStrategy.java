@@ -15,8 +15,6 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.apache.commons.lang.StringUtils;
-
 import opennlp.maxent.BasicEventStream;
 import opennlp.maxent.GIS;
 import opennlp.maxent.GISModel;
@@ -31,6 +29,8 @@ import com.grunick.addresstagger.data.Address;
 import com.grunick.addresstagger.data.AddressTag;
 import com.grunick.addresstagger.input.InputException;
 import com.grunick.addresstagger.input.InputSource;
+import com.grunick.addresstagger.strategy.unknown.FixedValueUnknownStrategy;
+import com.grunick.addresstagger.strategy.unknown.UnknownStrategy;
 
 public class MEMMStrategy implements TaggerStrategy {
 	
@@ -39,6 +39,8 @@ public class MEMMStrategy implements TaggerStrategy {
 	protected File persistFile;
 	protected int iterations;
 	protected int cutoff;
+	
+	UnknownStrategy unknowns = new FixedValueUnknownStrategy(0.0000001);
 	
 	EnumSet<AddressTag> values = EnumSet.allOf(AddressTag.class);
 	List<AddressTag> knownStates = Arrays.asList(values.toArray(new AddressTag[] {}));
@@ -201,12 +203,16 @@ public class MEMMStrategy implements TaggerStrategy {
 		
 	}
 	
-	// TODO: Better unknown word model?
 	public double predict(Address address, int idx, String prediction, String prevPrediction) {
 		String line = encodeAddress(address, idx, prediction, prevPrediction);
 		double[] outcomes = maxent.eval(line.trim().split(" "));
 		Map<String,Double> types = parseOutcomes(maxent.getAllOutcomes(outcomes));
-		return types.containsKey(prediction) ? types.get(prediction) : 0.0000001;
+		if (types.containsKey(prediction))
+			return types.get(prediction);
+		double value = unknowns.getTransitionProb(AddressTag.valueOf(prediction), AddressTag.valueOf(prevPrediction));
+		value += unknowns.getEmissionProb(AddressTag.valueOf(prediction), address.getAddressTokens().get(idx));
+				
+		return value;
 	}
 	
 	protected static Pattern pattern = Pattern.compile("(.*?)=(.*?)\\[(.*?)\\]"); 

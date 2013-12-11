@@ -11,6 +11,7 @@ public class ResponseTimeScorer implements Scorer {
 	public String scoreResult(Address address) {
 		long classifyTime = address.getClassifyTime();
 		totalTime += classifyTime;
+		count += 1;
 		return "Classify time: "+totalTime;
 	}
 

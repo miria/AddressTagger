@@ -101,10 +101,11 @@ public class AddressTaggerRunner {
 				System.out.println("----------------------------------------");
 			}
 			if (counter % 10000 == 0) {
-				StringBuilder builder = new StringBuilder("Tagged");
-				builder.append(counter).append(" ");
+				StringBuilder builder = new StringBuilder("Tagged ");
+				builder.append(counter).append(" errors=").append(error).append("\n");
 				for (Scorer scorer : scorers)
-					builder.append(scorer.getOverallScore()).append(" ");
+					builder.append(scorer.getOverallScore()).append("\n");
+				System.out.println(builder.toString());
 			}
 		}
 		

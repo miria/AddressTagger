@@ -94,6 +94,7 @@ public class CRFStrategy implements TaggerStrategy {
 			try {
 				address.setTag(i, AddressTag.valueOf(tags.tag(i)));
 			} catch (IllegalArgumentException e) {
+				System.out.println("CRF tagger can't find tag "+tags.tag(i));
 				address.setTag(i, AddressTag.UNK);
 			}
 		}

@@ -27,7 +27,7 @@ public class OverallAccuracyScorer implements Scorer {
 	}
 	
 	public String getOverallScore() {
-		return "Overall Accuracy: "+((double)globalCorrect) / ((double)globalTotal);
+		return "Overall Accuracy over "+globalTotal+" words: "+((double)globalCorrect) / ((double)globalTotal);
 	}
 
 }

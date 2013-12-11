@@ -11,6 +11,8 @@ import com.grunick.addresstagger.input.InputException;
 import com.grunick.addresstagger.input.InputSource;
 import com.grunick.addresstagger.stat.Counter;
 import com.grunick.addresstagger.stat.CounterMap;
+import com.grunick.addresstagger.strategy.unknown.FixedValueUnknownStrategy;
+import com.grunick.addresstagger.strategy.unknown.UnknownStrategy;
 
 public class InterpolatedHMMStrategy implements TaggerStrategy {
 
@@ -19,7 +21,8 @@ public class InterpolatedHMMStrategy implements TaggerStrategy {
 	private Counter<AddressTag> tagCounter;
 	private Map<AddressTag, Map<String, Double>> emProb;
 	
-	// TODO: Better unknown state model
+	protected UnknownStrategy unknowns = new FixedValueUnknownStrategy(0.0000001);
+	
 	protected double getTransitionProb(AddressTag prevPrevState, AddressTag prevState, AddressTag state) {
 		if (prevPrevState != null ) {
 			String trigramKey = getTrigramKey(prevPrevState, prevState);
@@ -30,17 +33,14 @@ public class InterpolatedHMMStrategy implements TaggerStrategy {
 		if (bigramTransProb.containsKey(bigramKey) && bigramTransProb.get(bigramKey).containsKey(state))
 			return bigramTransProb.get(bigramKey).get(state);
 
-		return 0.0000001;
+		return unknowns.getTransitionProb(prevState, state);
 	}
 
-	// TODO: Better unknown term model
 	protected double getEmissionProb(AddressTag state, String observation) {
 		if (emProb.containsKey(state) && emProb.get(state).containsKey(observation))
 			return emProb.get(state).get(observation);
-		return 0.0000001;
+		return unknowns.getEmissionProb(state, observation);
 	}
-	
-
 	
 	protected String getTrigramKey(AddressTag prevTag, AddressTag tag) {
 		return prevTag.toString()+"-"+tag.toString();

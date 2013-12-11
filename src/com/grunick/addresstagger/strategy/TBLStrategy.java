@@ -77,6 +77,7 @@ public class TBLStrategy implements TaggerStrategy {
 			try {
 				address.setTag(i, AddressTag.valueOf(tags.get(i)));
 			} catch (IllegalArgumentException e) {
+				System.out.println("TBL tagger can't find tag "+tags.get(i));
 				address.setTag(i, AddressTag.UNK);
 			}
 		}

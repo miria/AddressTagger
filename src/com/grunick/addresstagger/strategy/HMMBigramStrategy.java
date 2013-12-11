@@ -10,24 +10,26 @@ import com.grunick.addresstagger.data.AddressTag;
 import com.grunick.addresstagger.input.InputException;
 import com.grunick.addresstagger.input.InputSource;
 import com.grunick.addresstagger.stat.CounterMap;
+import com.grunick.addresstagger.strategy.unknown.FixedValueUnknownStrategy;
+import com.grunick.addresstagger.strategy.unknown.UnknownStrategy;
 
 public class HMMBigramStrategy implements TaggerStrategy {
 	
 	private Map<AddressTag, Map<AddressTag, Double>> transProb;
 	private Map<AddressTag, Map<String, Double>> emProb;
 	
-	// TODO: Better unknown state model
+	protected UnknownStrategy unknowns = new FixedValueUnknownStrategy(0.0000001);
+	
 	protected double getTransitionProb(AddressTag state1, AddressTag state2) {
 		if (transProb.containsKey(state1) && transProb.get(state1).containsKey(state2))
 			return transProb.get(state1).get(state2);
-		return 0.0000001;
+		return unknowns.getTransitionProb(state1, state2);
 	}
 
-	// TODO: Better unknown term model
 	protected double getEmissionProb(AddressTag state, String observation) {
 		if (emProb.containsKey(state) && emProb.get(state).containsKey(observation))
 			return emProb.get(state).get(observation);
-		return 0.0000001;
+		return unknowns.getEmissionProb(state, observation);
 	}
 
 	public List<AddressTag> viterbi(List<String> observations) {

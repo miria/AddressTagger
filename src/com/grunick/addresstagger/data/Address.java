@@ -11,6 +11,7 @@ public class Address {
 	protected List<String> addressTokens;
 	protected List<AddressTag> knownTags;
 	protected List<AddressTag> guessedTags;
+	protected long classifyTime;
 	
 	public Address(String fullName, List<String> nameTokens, List<AddressTag> knownTags) {
 		this.fullName = fullName;
@@ -44,6 +45,14 @@ public class Address {
 
 	public String getFullName() {
 		return fullName;
+	}
+	
+	public void setClassifyTime(long time) {
+		this.classifyTime = time;
+	}
+	
+	public long getClassifyTime() {
+		return classifyTime;
 	}
 
 

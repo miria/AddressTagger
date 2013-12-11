@@ -4,12 +4,12 @@ import com.grunick.addresstagger.data.Address;
 import com.grunick.addresstagger.data.AddressTag;
 
 
-public class AccuracyScorer implements Scorer {
+public class OverallAccuracyScorer implements Scorer {
 	
 	private int globalCorrect = 0;
 	private int globalTotal = 0;
 	
-	public double scoreResult(Address address) {
+	public String scoreResult(Address address) {
 		int correct = 0;
 		int total = 0;
 		for (int i=0; i < address.getAddressTokens().size(); i++) {
@@ -22,11 +22,12 @@ public class AccuracyScorer implements Scorer {
 				globalCorrect++;
 			}
 		}
-		return ((double)correct) / ((double)total);
+		double score = ((double)correct) / ((double)total);
+		return "Accuracy: "+score;
 	}
 	
-	public double getOverallScore() {
-		return ((double)globalCorrect) / ((double)globalTotal);
+	public String getOverallScore() {
+		return "Overall Accuracy: "+((double)globalCorrect) / ((double)globalTotal);
 	}
 
 }

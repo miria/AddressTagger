@@ -4,6 +4,6 @@ import com.grunick.addresstagger.data.Address;
 
 public interface Scorer {
 
-	public double scoreResult(Address address);
-	public double getOverallScore();
+	public String scoreResult(Address address);
+	public String getOverallScore();
 }

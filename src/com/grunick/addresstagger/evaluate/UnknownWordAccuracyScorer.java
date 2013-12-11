@@ -16,7 +16,7 @@ public class UnknownWordAccuracyScorer implements Scorer {
 	}
 	 
 	
-	public double scoreResult(Address address) {
+	public String scoreResult(Address address) {
 		int correct = 0;
 		int total = 0;
 		for (int i=0; i < address.getAddressTokens().size(); i++) {
@@ -31,11 +31,11 @@ public class UnknownWordAccuracyScorer implements Scorer {
 				globalCorrect++;
 			}
 		}
-		return ((double)correct) / ((double)total);
+		return "Unknown word accuracy: "+((double)correct) / ((double)total);
 	}
 	
-	public double getOverallScore() {
-
-		return ((double)globalCorrect) / ((double)globalTotal);
+	public String getOverallScore() {
+		System.out.println("global c "+globalCorrect+" global t "+ globalTotal);
+		return "Overall unknown word accuracy: "+((double)globalCorrect) / ((double)globalTotal);
 	}
 }

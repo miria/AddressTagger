@@ -15,6 +15,7 @@ import org.apache.commons.lang.BooleanUtils;
 import com.grunick.addresstagger.input.InputException;
 import com.grunick.addresstagger.input.InputSource;
 import com.grunick.addresstagger.input.InputSourceFactory;
+import com.grunick.addresstagger.input.InputUtils;
 import com.grunick.addresstagger.strategy.TaggerStrategy;
 import com.grunick.addresstagger.strategy.TaggerStrategyFactory;
 import com.grunick.addresstagger.tokenize.Tokenizer;
@@ -61,8 +62,8 @@ public class TaggerConfigBuilder {
 	protected static InputSource loadInputSource(String keyPrefix, Configuration properties) throws ConfigurationException {
 		String sourceType = properties.getString(keyPrefix+".type");
 		String tokenizerType = properties.getString(keyPrefix+".tokenizer.type");
-		Map<String,String> sourceConfig = getInputConfig(keyPrefix, properties);
-		Map<String,String> tokenizerConfig = getInputConfig(keyPrefix+".tokenizer", properties);
+		Map<String,String> sourceConfig = InputUtils.getSuffixMap(keyPrefix, properties);
+		Map<String,String> tokenizerConfig = InputUtils.getSuffixMap(keyPrefix+".tokenizer", properties);
 
 		try {
 			InputSource source = InputSourceFactory.makeInputSource(sourceType, sourceConfig);
@@ -85,7 +86,7 @@ public class TaggerConfigBuilder {
 	
 	protected static TaggerStrategy loadStrategy(Configuration properties, TaggerConfig config) throws ConfigurationException {
 		String type = properties.getString("strategy");
-		Map<String,String> strategyConfig = getInputConfig("strategy.conf", properties);
+		Map<String,String> strategyConfig = InputUtils.getSuffixMap("strategy.conf", properties);
 		TaggerStrategy strategy;
 		try {
 			strategy = TaggerStrategyFactory.makeStrategy(type, strategyConfig);
@@ -97,17 +98,6 @@ public class TaggerConfigBuilder {
 		}
 
 		
-	}
-	
-	protected static Map<String,String> getInputConfig(String prefix, Configuration properties) {
-		Map<String,String> sourceConfig = new HashMap<String,String>();
-		
-		for (Iterator<String> keysIter = properties.getKeys(prefix); keysIter.hasNext(); ) {
-			String key = keysIter.next();
-			sourceConfig.put(key.substring(prefix.length()+1, key.length()), properties.getString(key));
-		}
-		
-		return sourceConfig;
 	}
 
 }

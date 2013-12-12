@@ -21,7 +21,7 @@ public class InputSourceFactory {
 			return makeFileInputSource(config);
 		if (InputSourceTypes.NO_OP_SOURCE.equalsIgnoreCase(type))
 			return new NoOpInputSource();
-		return null;
+		throw new InputException("Unknown InputSource "+type);
 	}
 
 }

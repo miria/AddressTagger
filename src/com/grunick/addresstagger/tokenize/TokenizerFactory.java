@@ -74,6 +74,6 @@ public class TokenizerFactory {
 			return new NoOpTokenizer();
 		if (TokenizerTypes.COLUMN_TOKENIZER.equalsIgnoreCase(type))
 			return makeTaggedColumnTokenizer(tokenizerConfig);
-		return null;
+		throw new InputException("Unknown Tokenizer "+type);
 	}
 }

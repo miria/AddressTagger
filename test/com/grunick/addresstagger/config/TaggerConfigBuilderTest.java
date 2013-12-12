@@ -4,8 +4,6 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
-import java.util.Map;
-
 import org.apache.commons.configuration.BaseConfiguration;
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.configuration.ConfigurationException;
@@ -58,21 +56,7 @@ public class TaggerConfigBuilderTest {
 		TaggerConfig config = TaggerConfigBuilder.loadConfiguration("test/data/test.properties");
 		assertNotNull(config);
 	}
-	
-	@Test
-	public void testGetInputSourceConfig() {
-		Configuration conf = new BaseConfiguration();
-		conf.setProperty("prefix.key1", "value1");
-		conf.setProperty("prefix.key2", "value2");
-		conf.setProperty("notprefix.key3", "value3");
-		
-		Map<String,String> config = TaggerConfigBuilder.getInputConfig("prefix", conf);
-		assertEquals(config.get("key1"), "value1");
-		assertEquals(config.get("key2"), "value2");
-		assertEquals(config.get("key3"), null);
-		
-	}
-	
+
 	
 
 }

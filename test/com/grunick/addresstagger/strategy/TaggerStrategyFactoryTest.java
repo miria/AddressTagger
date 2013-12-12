@@ -1,6 +1,5 @@
 package com.grunick.addresstagger.strategy;
 
-import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 import java.util.HashMap;
@@ -13,11 +12,10 @@ import org.junit.Test;
 
 public class TaggerStrategyFactoryTest {
 	
-	@Test
+	@Test(expected=InputException.class)
 	public void testUnknownStrategy() throws InputException {
 		Map<String,String> config = new HashMap<String,String>();
-		TaggerStrategy strategy = TaggerStrategyFactory.makeStrategy("dasfasdf", config);
-		assertNull(strategy);
+		TaggerStrategyFactory.makeStrategy("dasfasdf", config);
 	}
 
 	

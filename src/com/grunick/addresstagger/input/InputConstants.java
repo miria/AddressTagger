@@ -34,6 +34,7 @@ public class InputConstants {
 		public static final String MOST_LIKELY_TAG_STRATEGY = "mostFrequent";
 		public static final String HMM_BIGRAM_STRATEGY = "HMMBigram";
 		public static final String HMM_TRIGRAM_STRATEGY = "HMMTrigram";
+		public static final String HMM_INTERPOLATED_STRATEGY = "interpolated";
 		public static final String MEMM_STRATEGY = "MEMM";
 		public static final String TBL_STRATEGY = "TBL";
 		public static final String CRF_STRATEGY = "CRF";
@@ -50,5 +51,17 @@ public class InputConstants {
 		public static final String TEMPLATE_FILE = "template_file";
 		public static final String GUESSER_FILE = "guesser_file";	
 
+	}
+	
+	public static class UnknownWordTypes {
+		public static final String FIXED_VALUE_STRATEGY = "fixed";
+		public static final String MAXENT_STRATEGY = "maxent";
+		public static final String MOST_LIKELY_STRATEGY = "mostLikely";
+	}
+	
+	public static class UnknownWordConfig {
+		public static final String PERSIST_FILE = "persist_file";
+		public static final String ENTROPY_FILE = "entropy_file";
+		public static final String VALUE = "value";
 	}
 }

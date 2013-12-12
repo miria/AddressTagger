@@ -11,7 +11,6 @@ import com.grunick.addresstagger.input.InputException;
 import com.grunick.addresstagger.input.InputSource;
 import com.grunick.addresstagger.stat.Counter;
 import com.grunick.addresstagger.stat.CounterMap;
-import com.grunick.addresstagger.strategy.unknown.FixedValueUnknownStrategy;
 import com.grunick.addresstagger.strategy.unknown.UnknownStrategy;
 
 public class InterpolatedHMMStrategy implements TaggerStrategy {
@@ -21,7 +20,11 @@ public class InterpolatedHMMStrategy implements TaggerStrategy {
 	private Counter<AddressTag> tagCounter;
 	private Map<AddressTag, Map<String, Double>> emProb;
 	
-	protected UnknownStrategy unknowns = new FixedValueUnknownStrategy(0.0000001);
+	protected UnknownStrategy unknowns;
+	
+	public InterpolatedHMMStrategy(UnknownStrategy unknowns) {
+		this.unknowns = unknowns;
+	}
 	
 	protected double getTransitionProb(AddressTag prevPrevState, AddressTag prevState, AddressTag state) {
 		if (prevPrevState != null ) {

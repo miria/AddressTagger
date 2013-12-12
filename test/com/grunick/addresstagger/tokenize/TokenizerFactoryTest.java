@@ -1,6 +1,5 @@
 package com.grunick.addresstagger.tokenize;
 
-import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 import java.util.HashMap;
@@ -14,11 +13,10 @@ import com.grunick.addresstagger.input.InputException;
 
 public class TokenizerFactoryTest {
 	
-	@Test
+	@Test(expected=InputException.class)
 	public void testMakeTokenizerUnknown() throws InputException {
 		Map<String,String> config = new HashMap<String,String>();
-		Tokenizer tokenizer = TokenizerFactory.makeTokenizer("adsf", config);
-		assertNull(tokenizer);
+		TokenizerFactory.makeTokenizer("adsf", config);
 	}
 	
 	@Test

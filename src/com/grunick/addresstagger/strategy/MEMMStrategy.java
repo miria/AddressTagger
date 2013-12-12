@@ -29,7 +29,6 @@ import com.grunick.addresstagger.data.Address;
 import com.grunick.addresstagger.data.AddressTag;
 import com.grunick.addresstagger.input.InputException;
 import com.grunick.addresstagger.input.InputSource;
-import com.grunick.addresstagger.strategy.unknown.FixedValueUnknownStrategy;
 import com.grunick.addresstagger.strategy.unknown.UnknownStrategy;
 
 public class MEMMStrategy implements TaggerStrategy {
@@ -40,17 +39,18 @@ public class MEMMStrategy implements TaggerStrategy {
 	protected int iterations;
 	protected int cutoff;
 	
-	UnknownStrategy unknowns = new FixedValueUnknownStrategy(0.0000001);
+	UnknownStrategy unknowns;
 	
 	EnumSet<AddressTag> values = EnumSet.allOf(AddressTag.class);
 	List<AddressTag> knownStates = Arrays.asList(values.toArray(new AddressTag[] {}));
 	
 	
-	public MEMMStrategy(File entropyFile, File persistFile, int iterations, int cutoff) {
+	public MEMMStrategy(File entropyFile, File persistFile, int iterations, int cutoff, UnknownStrategy unknowns) {
 		this.entropyFile = entropyFile;
 		this.persistFile = persistFile;
 		this.iterations = iterations;
 		this.cutoff = cutoff;
+		this.unknowns = unknowns;
 	}
 
 	@Override

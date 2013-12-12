@@ -7,6 +7,8 @@ import com.grunick.addresstagger.input.InputConstants.StrategyConfig;
 import com.grunick.addresstagger.input.InputConstants.StrategyTypes;
 import com.grunick.addresstagger.input.InputException;
 import com.grunick.addresstagger.input.InputUtils;
+import com.grunick.addresstagger.strategy.unknown.UnknownStrategy;
+import com.grunick.addresstagger.strategy.unknown.UnknownStrategyFactory;
 
 public class TaggerStrategyFactory {
 
@@ -18,16 +20,23 @@ public class TaggerStrategyFactory {
 		if (StrategyTypes.NO_OP_STRATEGY.equalsIgnoreCase(type))
 			return new NoOpTaggerStrategy();
 		if (StrategyTypes.HMM_BIGRAM_STRATEGY.equalsIgnoreCase(type))
-			return new HMMBigramStrategy();
+			return new HMMBigramStrategy(getUnknownStrategy(strategyConfig));
 		if (StrategyTypes.HMM_TRIGRAM_STRATEGY.equalsIgnoreCase(type))
-			return new HMMTrigramStrategy();
+			return new HMMTrigramStrategy(getUnknownStrategy(strategyConfig));
+		if (StrategyTypes.HMM_INTERPOLATED_STRATEGY.equalsIgnoreCase(type))
+			return new InterpolatedHMMStrategy(getUnknownStrategy(strategyConfig));
 		if (StrategyTypes.MEMM_STRATEGY.equalsIgnoreCase(type))
 			return getMEMMStrategy(strategyConfig);
 		if (StrategyTypes.TBL_STRATEGY.equalsIgnoreCase(type))
 			return getTBLStrategy(strategyConfig);
 		if (StrategyTypes.CRF_STRATEGY.equalsIgnoreCase(type))
 			return new CRFStrategy();
-		return null;
+		throw new InputException("Unknown TaggerStrategy "+type);
+	}
+	
+	protected static UnknownStrategy getUnknownStrategy(Map<String,String> strategyConfig) throws InputException {
+		Map<String,String> config = InputUtils.getSuffixMap("unknown", strategyConfig);
+		return UnknownStrategyFactory.getUnknownStrategy(config.get("type"), config);
 	}
 	
 	
@@ -40,7 +49,7 @@ public class TaggerStrategyFactory {
 		File entropyFile = new File(config.get(StrategyConfig.ENTROPY_FILE));
 		int cutoff = InputUtils.parseInt(config, StrategyConfig.CUTOFF);
 		int iterations = InputUtils.parseInt(config, StrategyConfig.ITERATIONS);
-		return new MEMMStrategy(entropyFile, persistFile, iterations, cutoff);
+		return new MEMMStrategy(entropyFile, persistFile, iterations, cutoff, getUnknownStrategy(config));
 		
 	}
 	

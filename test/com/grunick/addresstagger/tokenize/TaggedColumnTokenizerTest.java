@@ -25,7 +25,7 @@ public class TaggedColumnTokenizerTest {
 	public void testTokenizeStringManyTerm() {
 		TaggedColumnTokenizer tokenizer = getTokenizer();
 		assertEquals(tokenizer.tokenizeString("Route  I-187   N"), 
-				Arrays.asList(new String[] {"Route", "I-187", "N"}));
+				Arrays.asList(new String[] {"Route", "I", "187", "N"}));
 	}
 
 	

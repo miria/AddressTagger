@@ -10,7 +10,6 @@ import com.grunick.addresstagger.data.AddressTag;
 import com.grunick.addresstagger.input.InputException;
 import com.grunick.addresstagger.input.InputSource;
 import com.grunick.addresstagger.stat.CounterMap;
-import com.grunick.addresstagger.strategy.unknown.FixedValueUnknownStrategy;
 import com.grunick.addresstagger.strategy.unknown.UnknownStrategy;
 
 public class HMMBigramStrategy implements TaggerStrategy {
@@ -18,7 +17,11 @@ public class HMMBigramStrategy implements TaggerStrategy {
 	private Map<AddressTag, Map<AddressTag, Double>> transProb;
 	private Map<AddressTag, Map<String, Double>> emProb;
 	
-	protected UnknownStrategy unknowns = new FixedValueUnknownStrategy(0.0000001);
+	protected UnknownStrategy unknowns;
+	
+	public HMMBigramStrategy(UnknownStrategy unknowns) {
+		this.unknowns = unknowns;
+	}
 	
 	protected double getTransitionProb(AddressTag state1, AddressTag state2) {
 		if (transProb.containsKey(state1) && transProb.get(state1).containsKey(state2))

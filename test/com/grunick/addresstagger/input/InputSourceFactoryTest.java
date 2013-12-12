@@ -1,6 +1,5 @@
 package com.grunick.addresstagger.input;
 
-import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 import java.util.HashMap;
@@ -12,10 +11,9 @@ import com.grunick.addresstagger.input.InputConstants.FileConfig;
 
 public class InputSourceFactoryTest {
 	
-	@Test
+	@Test(expected=InputException.class)
 	public void testGetUnknownInputSource() throws InputException {
-		InputSource source = InputSourceFactory.makeInputSource("adsfds", new HashMap<String,String>());
-		assertNull(source);
+		InputSourceFactory.makeInputSource("adsfds", new HashMap<String,String>());
 	}
 	
 	@Test

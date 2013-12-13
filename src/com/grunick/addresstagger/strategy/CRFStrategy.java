@@ -14,6 +14,7 @@ import com.aliasi.io.Reporters;
 import com.aliasi.stats.AnnealingSchedule;
 import com.aliasi.stats.RegressionPrior;
 import com.aliasi.tag.Tagging;
+import com.aliasi.util.Strings;
 import com.grunick.addresstagger.data.Address;
 import com.grunick.addresstagger.data.AddressTag;
 import com.grunick.addresstagger.input.InputException;
@@ -25,7 +26,7 @@ public class CRFStrategy implements TaggerStrategy {
 	
 	protected ChainCrf<String> crfModel;
 	
-	public static class AddressCorpus extends Corpus<ObjectHandler<Tagging<String>>> {
+	class AddressCorpus extends Corpus<ObjectHandler<Tagging<String>>> {
 		
 		protected InputSource input;
 		
@@ -34,7 +35,10 @@ public class CRFStrategy implements TaggerStrategy {
 		}
 		
 	    public void visitTrain(ObjectHandler<Tagging<String>> handler) {
-	    	
+	    	int count =0;
+	    	try {
+				input.reset();
+			} catch (InputException e) {}
 			while (input.hasNext()) {
 				try {
 					Address address = input.getNext();
@@ -45,6 +49,7 @@ public class CRFStrategy implements TaggerStrategy {
 						tags.add(tag.toString());
 		            Tagging<String> tagging = new Tagging<String>(address.getAddressTokens(), tags);
 		            handler.handle(tagging);
+		            count++;
 				} catch (InputException ie) {}
 			}
 	    }
@@ -53,33 +58,33 @@ public class CRFStrategy implements TaggerStrategy {
 	        // Do nothing.
 	    }
 	}
-
-
+	
 	@Override
 	public void train(InputSource source) throws InputException {
 		Corpus<ObjectHandler<Tagging<String>>> corpus = new AddressCorpus(source);
         ChainCrfFeatureExtractor<String> featureExtractor= new AddressChainCrfFeatureExtractor();
-        boolean addIntercept = true;  //t
+        boolean addIntercept = true;  
         int minFeatureCount = 1;
         boolean cacheFeatures = false;
         boolean allowUnseenTransitions = true;
-        double priorVariance = 4.0;
-        boolean uninformativeIntercept = true; //t
+        double priorVariance = 4.0; 
+        boolean uninformativeIntercept = true; 
         RegressionPrior prior = RegressionPrior.gaussian(priorVariance, uninformativeIntercept);
-        int priorBlockSize = 1;  //3
+        int priorBlockSize = 3;  
         double initialLearningRate = 0.05;
         double learningRateDecay = 0.995;
         AnnealingSchedule annealingSchedule = AnnealingSchedule.exponential(initialLearningRate, learningRateDecay);
 
         double minImprovement = 0.00001;
-        int minEpochs = 2;
-        int maxEpochs = 2000;
+        int minEpochs = 2; 
+        int maxEpochs = 5;
 
-        Reporter reporter = Reporters.stdOut().setLevel(LogLevel.TRACE);
+        Reporter reporter = Reporters.stdOut().setLevel(LogLevel.DEBUG);
 
 		try {
-			crfModel = ChainCrf.estimate(corpus, featureExtractor, addIntercept, minFeatureCount, cacheFeatures, allowUnseenTransitions,
-			                    prior, priorBlockSize, annealingSchedule, minImprovement, minEpochs, maxEpochs, reporter);
+			crfModel = ChainCrf.estimate(corpus, featureExtractor, addIntercept, minFeatureCount,
+		                         cacheFeatures, allowUnseenTransitions, prior, priorBlockSize,
+		                         annealingSchedule, minImprovement, minEpochs, maxEpochs, reporter);
 		} catch (IOException e) {
 			throw new InputException("Unable to generate CRF model : "+e.getMessage());
 		}
@@ -94,7 +99,6 @@ public class CRFStrategy implements TaggerStrategy {
 			try {
 				address.setTag(i, AddressTag.valueOf(tags.tag(i)));
 			} catch (IllegalArgumentException e) {
-				System.out.println("CRF tagger can't find tag "+tags.tag(i));
 				address.setTag(i, AddressTag.UNK);
 			}
 		}

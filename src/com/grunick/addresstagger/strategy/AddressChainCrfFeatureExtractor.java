@@ -10,7 +10,7 @@ import com.aliasi.crf.ChainCrfFeatures;
 
 public class AddressChainCrfFeatureExtractor implements ChainCrfFeatureExtractor<String>, Serializable {
 
-	private static final long serialVersionUID = 8545681040708379578L;
+	static final long serialVersionUID = 8545681040708379578L;
 
 	public ChainCrfFeatures<String> extract(List<String> tokens, List<String> tags) {
 		return new AddressChainCrfFeatures(tokens,tags);
@@ -27,7 +27,7 @@ public class AddressChainCrfFeatureExtractor implements ChainCrfFeatureExtractor
 		}
 		
 		public Map<String,Integer> edgeFeatures(int n, int k) {
-			return Collections.singletonMap("PREV_TOK_" + token(k), Integer.valueOf(1));
+			return Collections.singletonMap("PREV_TAG_" + tag(k), Integer.valueOf(1));
 		}
 	}
 }

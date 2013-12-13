@@ -15,7 +15,7 @@ public class UnknownStrategyFactory {
 		if (UnknownWordTypes.MOST_LIKELY_STRATEGY.equalsIgnoreCase(type))
 			return new MostLikelyUnknownStrategy();
 		if (UnknownWordTypes.MAXENT_STRATEGY.equalsIgnoreCase(type))
-			return new MaximumEntropyUnknownStrategy();
+			return new MaximumEntropyUnknownStrategy(config.get(UnknownWordConfig.ENTROPY_FILE), config.get(UnknownWordConfig.PERSIST_FILE));
 		if (UnknownWordTypes.FIXED_VALUE_STRATEGY.equalsIgnoreCase(type))
 			return new FixedValueUnknownStrategy(InputUtils.parseDouble(config, UnknownWordConfig.VALUE));
 		throw new InputException("Invalid UnknownStrategy "+type);

@@ -39,18 +39,22 @@ public class MEMMStrategy implements TaggerStrategy {
 	protected int iterations;
 	protected int cutoff;
 	
-	UnknownStrategy unknowns;
+	UnknownStrategy<AddressTag, String> unknowns;
 	
 	EnumSet<AddressTag> values = EnumSet.allOf(AddressTag.class);
 	List<AddressTag> knownStates = Arrays.asList(values.toArray(new AddressTag[] {}));
 	
+	protected UnknownStrategy<AddressTag, AddressTag> transmissionUnknowns;
+	protected UnknownStrategy<AddressTag, String> emissionUnknowns;
 	
-	public MEMMStrategy(File entropyFile, File persistFile, int iterations, int cutoff, UnknownStrategy unknowns) {
+	public MEMMStrategy(File entropyFile, File persistFile, int iterations, int cutoff, 
+			UnknownStrategy<AddressTag,AddressTag> transmissionUnknowns, UnknownStrategy<AddressTag, String> emissionUnknowns) {
 		this.entropyFile = entropyFile;
 		this.persistFile = persistFile;
 		this.iterations = iterations;
 		this.cutoff = cutoff;
-		this.unknowns = unknowns;
+		this.transmissionUnknowns = transmissionUnknowns;
+		this.emissionUnknowns = emissionUnknowns;
 	}
 
 	@Override
@@ -209,8 +213,8 @@ public class MEMMStrategy implements TaggerStrategy {
 		Map<String,Double> types = parseOutcomes(maxent.getAllOutcomes(outcomes));
 		if (types.containsKey(prediction))
 			return types.get(prediction);
-		double value = unknowns.getTransitionProb(AddressTag.valueOf(prediction), AddressTag.valueOf(prevPrediction));
-		value += unknowns.getEmissionProb(AddressTag.valueOf(prediction), address.getAddressTokens().get(idx));
+		double value = transmissionUnknowns.getProbability(AddressTag.valueOf(prediction), AddressTag.valueOf(prevPrediction));
+		value += emissionUnknowns.getProbability(AddressTag.valueOf(prediction), address.getAddressTokens().get(idx));
 				
 		return value;
 	}

@@ -17,22 +17,24 @@ public class HMMBigramStrategy implements TaggerStrategy {
 	private Map<AddressTag, Map<AddressTag, Double>> transProb;
 	private Map<AddressTag, Map<String, Double>> emProb;
 	
-	protected UnknownStrategy unknowns;
+	protected UnknownStrategy<AddressTag, AddressTag> transmissionUnknowns;
+	protected UnknownStrategy<AddressTag, String> emissionUnknowns;
 	
-	public HMMBigramStrategy(UnknownStrategy unknowns) {
-		this.unknowns = unknowns;
+	public HMMBigramStrategy(UnknownStrategy<AddressTag,AddressTag> transmissionUnknowns, UnknownStrategy<AddressTag, String> emissionUnknowns) {
+		this.transmissionUnknowns = transmissionUnknowns;
+		this.emissionUnknowns = emissionUnknowns;
 	}
 	
 	protected double getTransitionProb(AddressTag state1, AddressTag state2) {
 		if (transProb.containsKey(state1) && transProb.get(state1).containsKey(state2))
 			return transProb.get(state1).get(state2);
-		return unknowns.getTransitionProb(state1, state2);
+		return transmissionUnknowns.getProbability(state1, state2);
 	}
 
 	protected double getEmissionProb(AddressTag state, String observation) {
 		if (emProb.containsKey(state) && emProb.get(state).containsKey(observation))
 			return emProb.get(state).get(observation);
-		return unknowns.getEmissionProb(state, observation);
+		return emissionUnknowns.getProbability(state, observation);
 	}
 
 	public List<AddressTag> viterbi(List<String> observations) {

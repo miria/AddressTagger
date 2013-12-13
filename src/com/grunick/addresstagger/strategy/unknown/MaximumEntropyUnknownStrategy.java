@@ -2,10 +2,8 @@ package com.grunick.addresstagger.strategy.unknown;
 
 import opennlp.model.MaxentModel;
 
-import com.grunick.addresstagger.data.Address;
-import com.grunick.addresstagger.data.AddressTag;
 
-public class MaximumEntropyUnknownStrategy implements UnknownStrategy {
+public class MaximumEntropyUnknownStrategy<S,T> implements UnknownStrategy<S,T> {
 	
 	protected MaxentModel maxent;
 	protected String entropyFile;
@@ -17,40 +15,16 @@ public class MaximumEntropyUnknownStrategy implements UnknownStrategy {
 		this.entropyFile = entropyFile;
 		this.persistFile = persistFile;
 	}
-
-	@Override
-	public void train(Address address) {
-		fetchInit = false;
-		if (!trainInit) 
-			initializeTraining();
-		
-
-	}
 	
-	protected void initializeTraining() {
-		
-		
-		trainInit = true;
-	}
-	
-	protected void initializeMaxEnt() {
-		
-		fetchInit = true;
-	}
+	@Override
+	public void train(S state1, T state2) {}
 
 	@Override
-	public double getEmissionProb(AddressTag state, String observation) {
-		if (!fetchInit) 
-			initializeMaxEnt();
-		
-		return 0;
+	public double getProbability(S state1, T state2) {
+		return -1;
 	}
 
-	@Override
-	public double getTransitionProb(AddressTag state1, AddressTag state2) {
-		if (!fetchInit) 
-			initializeMaxEnt();
-		return 0;
-	}
+
+
 
 }

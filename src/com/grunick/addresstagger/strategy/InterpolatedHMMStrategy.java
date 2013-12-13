@@ -20,10 +20,12 @@ public class InterpolatedHMMStrategy implements TaggerStrategy {
 	private Counter<AddressTag> tagCounter;
 	private Map<AddressTag, Map<String, Double>> emProb;
 	
-	protected UnknownStrategy unknowns;
+	protected UnknownStrategy<AddressTag, AddressTag> transmissionUnknowns;
+	protected UnknownStrategy<AddressTag, String> emissionUnknowns;
 	
-	public InterpolatedHMMStrategy(UnknownStrategy unknowns) {
-		this.unknowns = unknowns;
+	public InterpolatedHMMStrategy(UnknownStrategy<AddressTag,AddressTag> transmissionUnknowns, UnknownStrategy<AddressTag, String> emissionUnknowns) {
+		this.transmissionUnknowns = transmissionUnknowns;
+		this.emissionUnknowns = emissionUnknowns;
 	}
 	
 	protected double getTransitionProb(AddressTag prevPrevState, AddressTag prevState, AddressTag state) {
@@ -36,13 +38,13 @@ public class InterpolatedHMMStrategy implements TaggerStrategy {
 		if (bigramTransProb.containsKey(bigramKey) && bigramTransProb.get(bigramKey).containsKey(state))
 			return bigramTransProb.get(bigramKey).get(state);
 
-		return unknowns.getTransitionProb(prevState, state);
+		return transmissionUnknowns.getProbability(prevState, state);
 	}
 
 	protected double getEmissionProb(AddressTag state, String observation) {
 		if (emProb.containsKey(state) && emProb.get(state).containsKey(observation))
 			return emProb.get(state).get(observation);
-		return unknowns.getEmissionProb(state, observation);
+		return emissionUnknowns.getProbability(state, observation);
 	}
 	
 	protected String getTrigramKey(AddressTag prevTag, AddressTag tag) {

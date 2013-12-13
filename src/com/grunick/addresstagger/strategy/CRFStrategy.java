@@ -14,7 +14,6 @@ import com.aliasi.io.Reporters;
 import com.aliasi.stats.AnnealingSchedule;
 import com.aliasi.stats.RegressionPrior;
 import com.aliasi.tag.Tagging;
-import com.aliasi.util.Strings;
 import com.grunick.addresstagger.data.Address;
 import com.grunick.addresstagger.data.AddressTag;
 import com.grunick.addresstagger.input.InputException;
@@ -35,7 +34,6 @@ public class CRFStrategy implements TaggerStrategy {
 		}
 		
 	    public void visitTrain(ObjectHandler<Tagging<String>> handler) {
-	    	int count =0;
 	    	try {
 				input.reset();
 			} catch (InputException e) {}
@@ -49,7 +47,6 @@ public class CRFStrategy implements TaggerStrategy {
 						tags.add(tag.toString());
 		            Tagging<String> tagging = new Tagging<String>(address.getAddressTokens(), tags);
 		            handler.handle(tagging);
-		            count++;
 				} catch (InputException ie) {}
 			}
 	    }

@@ -1,15 +1,9 @@
 package com.grunick.addresstagger.strategy.unknown;
 
-import com.grunick.addresstagger.data.Address;
-import com.grunick.addresstagger.data.AddressTag;
-
-public interface UnknownStrategy {
+public interface UnknownStrategy<S,T> {
 	
-	public void train(Address address);
+	public void train(S state1, T state2);
 	
-	public double getEmissionProb(AddressTag state, String observation);
-	
-	public double getTransitionProb(AddressTag state1, AddressTag state2);
-	
+	public double getProbability(S state1, T state2);	
 
 }

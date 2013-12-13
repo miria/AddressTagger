@@ -1,9 +1,7 @@
 package com.grunick.addresstagger.strategy.unknown;
 
-import com.grunick.addresstagger.data.Address;
-import com.grunick.addresstagger.data.AddressTag;
 
-public class FixedValueUnknownStrategy implements UnknownStrategy {
+public class FixedValueUnknownStrategy<S,T> implements UnknownStrategy<S,T> {
 	
 	private double value;
 	
@@ -12,15 +10,10 @@ public class FixedValueUnknownStrategy implements UnknownStrategy {
 	}
 
 	@Override
-	public void train(Address address) {}
+	public void train(S state1, T state2) {}
 
 	@Override
-	public double getEmissionProb(AddressTag state, String observation) {
-		return value;
-	}
-
-	@Override
-	public double getTransitionProb(AddressTag state1, AddressTag state2) {
+	public double getProbability(S state1, T state2) {
 		return value;
 	}
 

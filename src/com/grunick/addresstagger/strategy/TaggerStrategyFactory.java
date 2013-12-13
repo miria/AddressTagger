@@ -3,6 +3,7 @@ package com.grunick.addresstagger.strategy;
 import java.io.File;
 import java.util.Map;
 
+import com.grunick.addresstagger.data.AddressTag;
 import com.grunick.addresstagger.input.InputConstants.StrategyConfig;
 import com.grunick.addresstagger.input.InputConstants.StrategyTypes;
 import com.grunick.addresstagger.input.InputException;
@@ -20,11 +21,11 @@ public class TaggerStrategyFactory {
 		if (StrategyTypes.NO_OP_STRATEGY.equalsIgnoreCase(type))
 			return new NoOpTaggerStrategy();
 		if (StrategyTypes.HMM_BIGRAM_STRATEGY.equalsIgnoreCase(type))
-			return new HMMBigramStrategy(getUnknownStrategy(strategyConfig));
+			return new HMMBigramStrategy(getTransitionStrategy(strategyConfig), getEmissionStrategy(strategyConfig));
 		if (StrategyTypes.HMM_TRIGRAM_STRATEGY.equalsIgnoreCase(type))
-			return new HMMTrigramStrategy(getUnknownStrategy(strategyConfig));
+			return new HMMTrigramStrategy(getTransitionStrategy(strategyConfig), getEmissionStrategy(strategyConfig));
 		if (StrategyTypes.HMM_INTERPOLATED_STRATEGY.equalsIgnoreCase(type))
-			return new InterpolatedHMMStrategy(getUnknownStrategy(strategyConfig));
+			return new InterpolatedHMMStrategy(getTransitionStrategy(strategyConfig), getEmissionStrategy(strategyConfig));
 		if (StrategyTypes.MEMM_STRATEGY.equalsIgnoreCase(type))
 			return getMEMMStrategy(strategyConfig);
 		if (StrategyTypes.TBL_STRATEGY.equalsIgnoreCase(type))
@@ -34,9 +35,14 @@ public class TaggerStrategyFactory {
 		throw new InputException("Unknown TaggerStrategy "+type);
 	}
 	
-	protected static UnknownStrategy getUnknownStrategy(Map<String,String> strategyConfig) throws InputException {
-		Map<String,String> config = InputUtils.getSuffixMap("unknown", strategyConfig);
-		return UnknownStrategyFactory.getUnknownStrategy(config.get("type"), config);
+	protected static UnknownStrategy<AddressTag,AddressTag> getTransitionStrategy(Map<String,String> strategyConfig) throws InputException {
+		Map<String,String> config = InputUtils.getSuffixMap("unknown.transmission", strategyConfig);
+		return UnknownStrategyFactory.getUnknownTransitionStrategy(config.get("type"), config);
+	}
+	
+	protected static UnknownStrategy<AddressTag,String> getEmissionStrategy(Map<String,String> strategyConfig) throws InputException {
+		Map<String,String> config = InputUtils.getSuffixMap("unknown.emission", strategyConfig);
+		return UnknownStrategyFactory.getUnknownEmissionStrategy(config.get("type"), config);
 	}
 	
 	
@@ -49,7 +55,7 @@ public class TaggerStrategyFactory {
 		File entropyFile = new File(config.get(StrategyConfig.ENTROPY_FILE));
 		int cutoff = InputUtils.parseInt(config, StrategyConfig.CUTOFF);
 		int iterations = InputUtils.parseInt(config, StrategyConfig.ITERATIONS);
-		return new MEMMStrategy(entropyFile, persistFile, iterations, cutoff, getUnknownStrategy(config));
+		return new MEMMStrategy(entropyFile, persistFile, iterations, cutoff, getTransitionStrategy(config), getEmissionStrategy(config));
 		
 	}
 	

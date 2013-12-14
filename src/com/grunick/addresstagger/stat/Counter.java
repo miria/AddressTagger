@@ -50,4 +50,10 @@ public class Counter<T> {
 		}
 		return Collections.unmodifiableMap(probMap);
 	}
+	
+	public double getProbability(T key) {
+		if (total == 0 || !counterMap.containsKey(key))
+			return 0.000001;
+		return (double)counterMap.get(key)/(double)total;
+	}
 }

@@ -56,7 +56,9 @@ public class InputConstants {
 	public static class UnknownWordTypes {
 		public static final String FIXED_VALUE_STRATEGY = "fixed";
 		public static final String MAXENT_STRATEGY = "maxent";
-		public static final String MOST_LIKELY_STRATEGY = "mostLikely";
+		public static final String FULL_DIST_STRATEGY = "fullDist";
+		public static final String SINGLETON_DIST_STRATEGY = "singleDist";
+		public static final String FEATURE_STRATEGY = "feature";
 	}
 	
 	public static class UnknownWordConfig {

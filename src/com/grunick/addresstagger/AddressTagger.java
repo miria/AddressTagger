@@ -20,7 +20,7 @@ public class AddressTagger {
 		strategy.train(config.getTrainingData());
 	}
 	
-	public void tagAddress(Address address) {
+	public void tagAddress(Address address) throws InputException {
 		strategy.tagAddress(address);
 	}
 

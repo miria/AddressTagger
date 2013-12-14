@@ -1,9 +1,13 @@
 package com.grunick.addresstagger.strategy.unknown;
 
-public interface UnknownStrategy<S,T> {
+import com.grunick.addresstagger.data.Address;
+import com.grunick.addresstagger.data.AddressTag;
+import com.grunick.addresstagger.input.InputException;
+
+public interface UnknownStrategy {
 	
-	public void train(S state1, T state2);
+	public void train(Address address) throws InputException;
 	
-	public double getProbability(S state1, T state2);	
+	public double getProbability(Address address, int index, AddressTag prediction) throws InputException;	
 
 }

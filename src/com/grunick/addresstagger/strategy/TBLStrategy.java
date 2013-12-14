@@ -13,6 +13,7 @@ import com.grunick.addresstagger.data.Address;
 import com.grunick.addresstagger.data.AddressTag;
 import com.grunick.addresstagger.input.InputException;
 import com.grunick.addresstagger.input.InputSource;
+import com.grunick.addresstagger.stat.Counter;
 
 public class TBLStrategy implements TaggerStrategy {
 
@@ -22,6 +23,7 @@ public class TBLStrategy implements TaggerStrategy {
 	protected String ruleFile;
 	protected String guesserFile;
 	protected TblTagger tagger;
+	private Counter<AddressTag> unknownStates = new Counter<AddressTag>();
 	
 	public TBLStrategy(String corpusFile, String templateFile, String ruleFile, String lexFile, String guesserFile) {
 		this.corpusFile = corpusFile;    // generated
@@ -48,6 +50,7 @@ public class TBLStrategy implements TaggerStrategy {
 					continue;
 
 				for (int i=0; i< address.size(); i++) {
+					unknownStates.increment(address.getKnownTags().get(i));
 					writer.write(address.getAddressTokens().get(i)+" "+address.getKnownTags().get(i));
 					writer.newLine();
 				}
@@ -77,8 +80,7 @@ public class TBLStrategy implements TaggerStrategy {
 			try {
 				address.setTag(i, AddressTag.valueOf(tags.get(i)));
 			} catch (IllegalArgumentException e) {
-				System.out.println("TBL tagger can't find tag "+tags.get(i));
-				address.setTag(i, AddressTag.UNK);
+				address.setTag(i, unknownStates.argMax());
 			}
 		}
 

@@ -8,7 +8,7 @@ public interface TaggerStrategy {
 	
 	public void train(InputSource source) throws InputException;
 	
-	public void tagAddress(Address address);
+	public void tagAddress(Address address) throws InputException;
 	
 	
 

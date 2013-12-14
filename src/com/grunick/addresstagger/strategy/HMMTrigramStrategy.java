@@ -9,6 +9,7 @@ import com.grunick.addresstagger.data.Address;
 import com.grunick.addresstagger.data.AddressTag;
 import com.grunick.addresstagger.input.InputException;
 import com.grunick.addresstagger.input.InputSource;
+import com.grunick.addresstagger.stat.Counter;
 import com.grunick.addresstagger.stat.CounterMap;
 import com.grunick.addresstagger.strategy.unknown.UnknownStrategy;
 
@@ -19,11 +20,10 @@ public class HMMTrigramStrategy implements TaggerStrategy {
 
 	private Map<AddressTag, Map<String, Double>> emProb;
 	
-	protected UnknownStrategy<AddressTag, AddressTag> transmissionUnknowns;
-	protected UnknownStrategy<AddressTag, String> emissionUnknowns;
+	protected UnknownStrategy emissionUnknowns;
+	private Counter<AddressTag> unknownStates = new Counter<AddressTag>();
 	
-	public HMMTrigramStrategy(UnknownStrategy<AddressTag,AddressTag> transmissionUnknowns, UnknownStrategy<AddressTag, String> emissionUnknowns) {
-		this.transmissionUnknowns = transmissionUnknowns;
+	public HMMTrigramStrategy(UnknownStrategy emissionUnknowns) {
 		this.emissionUnknowns = emissionUnknowns;
 	}
 
@@ -37,13 +37,14 @@ public class HMMTrigramStrategy implements TaggerStrategy {
 		if (bigramTransProb.containsKey(bigramKey) && bigramTransProb.get(bigramKey).containsKey(state))
 			return bigramTransProb.get(bigramKey).get(state);
 
-		return transmissionUnknowns.getProbability(prevState, state);
+		return unknownStates.getProbability( state);
 	}
 
-	protected double getEmissionProb(AddressTag state, String observation) {
+	protected double getEmissionProb(Address address, int idx, AddressTag state) throws InputException {
+		String observation = address.getAddressTokens().get(idx);
 		if (emProb.containsKey(state) && emProb.get(state).containsKey(observation))
 			return emProb.get(state).get(observation);
-		return emissionUnknowns.getProbability(state, observation);
+		return emissionUnknowns.getProbability(address, idx, state);
 	}
 	
 	protected String getTrigramKey(AddressTag prevTag, AddressTag tag) {
@@ -65,9 +66,12 @@ public class HMMTrigramStrategy implements TaggerStrategy {
 				
 				AddressTag prevPrevState = null;
 				AddressTag prevState = AddressTag.START;
+				emissionUnknowns.train(address);
+
 				
 				for (int i=0; i< address.size(); i++) {
 					bigramTransitionCounts.increment(prevState.toString(), address.getKnownTags().get(i));
+					unknownStates.increment(address.getKnownTags().get(i));
 					if (prevPrevState != null)
 						trigramTransitionCounts.increment(getTrigramKey(prevPrevState, prevState), address.getKnownTags().get(i));
 					emissionCounts.increment(address.getKnownTags().get(i), address.getAddressTokens().get(i));
@@ -85,7 +89,8 @@ public class HMMTrigramStrategy implements TaggerStrategy {
 		emProb = emissionCounts.getProbabilityMaps();	
 	}
 
-	public List<AddressTag> viterbi(List<String> observations) {
+	public List<AddressTag> viterbi(Address address) throws InputException {
+		List<String> observations = address.getAddressTokens();
 		if (observations.size() == 0)
 			return new ArrayList<AddressTag>();
 		
@@ -93,7 +98,7 @@ public class HMMTrigramStrategy implements TaggerStrategy {
 		Map<String, ViterbiNode<String>> stateMap = new HashMap<String, ViterbiNode<String>>();
 		List<Map<String, ViterbiNode<String>>> backPointer = new ArrayList<Map<String, ViterbiNode<String>>>();
 		for (AddressTag state : AddressTag.values()) {
-			double prob = getTransitionProb(null, AddressTag.START, state) * getEmissionProb(state, observations.get(0));
+			double prob = getTransitionProb(null, AddressTag.START, state) * getEmissionProb(address, 0, state);
 			String key = getTrigramKey(AddressTag.START,state);
 			stateMap.put(key, new ViterbiNode<String>(prob, key, prob));
 		}
@@ -101,7 +106,6 @@ public class HMMTrigramStrategy implements TaggerStrategy {
 
 		// Iteration step
 		for (int i=1; i < observations.size(); i++) {
-			String obs = observations.get(i);
 			HashMap<String, ViterbiNode<String>> nextStates = new HashMap<String, ViterbiNode<String>>();
 			for (AddressTag next : AddressTag.values()) {
 
@@ -115,7 +119,7 @@ public class HMMTrigramStrategy implements TaggerStrategy {
 						ViterbiNode<String> node = stateMap.get(key);
 						if (node == null)
 							continue;
-						double curProb = getEmissionProb(next, obs) * getTransitionProb(prevPrevious, previous, next);
+						double curProb = getEmissionProb(address, i, next) * getTransitionProb(prevPrevious, previous, next);
 						double totalProb = node.getTotalScore() * curProb;
 						stateTotal += totalProb;
 						if (totalProb > stateMax) {
@@ -178,8 +182,8 @@ public class HMMTrigramStrategy implements TaggerStrategy {
 	}
 
 	@Override
-	public void tagAddress(Address address) {
-		List<AddressTag> tags = viterbi(address.getAddressTokens());
+	public void tagAddress(Address address) throws InputException {
+		List<AddressTag> tags = viterbi(address);
 		
 		for (int i=0; i< address.size(); i++) {
 			address.setTag(i, tags.get(i));

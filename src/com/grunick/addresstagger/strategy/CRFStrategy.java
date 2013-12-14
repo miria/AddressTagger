@@ -18,12 +18,14 @@ import com.grunick.addresstagger.data.Address;
 import com.grunick.addresstagger.data.AddressTag;
 import com.grunick.addresstagger.input.InputException;
 import com.grunick.addresstagger.input.InputSource;
+import com.grunick.addresstagger.stat.Counter;
 
 
 
 public class CRFStrategy implements TaggerStrategy {
 	
 	protected ChainCrf<String> crfModel;
+	private Counter<AddressTag> unknownStates = new Counter<AddressTag>();
 	
 	class AddressCorpus extends Corpus<ObjectHandler<Tagging<String>>> {
 		
@@ -43,8 +45,10 @@ public class CRFStrategy implements TaggerStrategy {
 					if (address.size() == 0)
 						continue;
 					List<String> tags = new ArrayList<String>();
-					for (AddressTag tag : address.getKnownTags())
+					for (AddressTag tag : address.getKnownTags()) {
+						unknownStates.increment(tag);
 						tags.add(tag.toString());
+					}
 		            Tagging<String> tagging = new Tagging<String>(address.getAddressTokens(), tags);
 		            handler.handle(tagging);
 				} catch (InputException ie) {}
@@ -96,7 +100,7 @@ public class CRFStrategy implements TaggerStrategy {
 			try {
 				address.setTag(i, AddressTag.valueOf(tags.tag(i)));
 			} catch (IllegalArgumentException e) {
-				address.setTag(i, AddressTag.UNK);
+				address.setTag(i, unknownStates.argMax());
 			}
 		}
 	}

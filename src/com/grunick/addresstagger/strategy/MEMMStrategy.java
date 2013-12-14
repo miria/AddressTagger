@@ -29,6 +29,7 @@ import com.grunick.addresstagger.data.Address;
 import com.grunick.addresstagger.data.AddressTag;
 import com.grunick.addresstagger.input.InputException;
 import com.grunick.addresstagger.input.InputSource;
+import com.grunick.addresstagger.stat.Counter;
 import com.grunick.addresstagger.strategy.unknown.UnknownStrategy;
 
 public class MEMMStrategy implements TaggerStrategy {
@@ -39,21 +40,19 @@ public class MEMMStrategy implements TaggerStrategy {
 	protected int iterations;
 	protected int cutoff;
 	
-	UnknownStrategy<AddressTag, String> unknowns;
+	UnknownStrategy unknowns;
 	
 	EnumSet<AddressTag> values = EnumSet.allOf(AddressTag.class);
 	List<AddressTag> knownStates = Arrays.asList(values.toArray(new AddressTag[] {}));
 	
-	protected UnknownStrategy<AddressTag, AddressTag> transmissionUnknowns;
-	protected UnknownStrategy<AddressTag, String> emissionUnknowns;
+	protected UnknownStrategy emissionUnknowns;
+	private Counter<AddressTag> unknownStates = new Counter<AddressTag>();
 	
-	public MEMMStrategy(File entropyFile, File persistFile, int iterations, int cutoff, 
-			UnknownStrategy<AddressTag,AddressTag> transmissionUnknowns, UnknownStrategy<AddressTag, String> emissionUnknowns) {
+	public MEMMStrategy(File entropyFile, File persistFile, int iterations, int cutoff, UnknownStrategy emissionUnknowns) {
 		this.entropyFile = entropyFile;
 		this.persistFile = persistFile;
 		this.iterations = iterations;
 		this.cutoff = cutoff;
-		this.transmissionUnknowns = transmissionUnknowns;
 		this.emissionUnknowns = emissionUnknowns;
 	}
 
@@ -68,8 +67,10 @@ public class MEMMStrategy implements TaggerStrategy {
 					Address address = source.getNext();
 					if (address.size() == 0)
 						continue;
-
+					
+					emissionUnknowns.train(address);
 					for (int i=0; i<address.size(); i++) {
+						unknownStates.increment(address.getKnownTags().get(i));
 						writer.write(encodeAddress(address, i, null, null));
 						writer.newLine();
 					}
@@ -89,7 +90,7 @@ public class MEMMStrategy implements TaggerStrategy {
 	}
 
 	@Override
-	public void tagAddress(Address address) {
+	public void tagAddress(Address address) throws InputException {
 		List<AddressTag> tags = viterbi(address);
 		
 		for (int i=0; i< address.size(); i++) {
@@ -99,7 +100,7 @@ public class MEMMStrategy implements TaggerStrategy {
 	}
 
 	
-	public List<AddressTag> viterbi(Address address) {
+	public List<AddressTag> viterbi(Address address) throws InputException {
 		List<String> observations = address.getAddressTokens();
 		if (observations.size() == 0)
 			return new ArrayList<AddressTag>();
@@ -207,14 +208,14 @@ public class MEMMStrategy implements TaggerStrategy {
 		
 	}
 	
-	public double predict(Address address, int idx, String prediction, String prevPrediction) {
+	public double predict(Address address, int idx, String prediction, String prevPrediction) throws InputException {
 		String line = encodeAddress(address, idx, prediction, prevPrediction);
 		double[] outcomes = maxent.eval(line.trim().split(" "));
 		Map<String,Double> types = parseOutcomes(maxent.getAllOutcomes(outcomes));
 		if (types.containsKey(prediction))
 			return types.get(prediction);
-		double value = transmissionUnknowns.getProbability(AddressTag.valueOf(prediction), AddressTag.valueOf(prevPrediction));
-		value += emissionUnknowns.getProbability(AddressTag.valueOf(prediction), address.getAddressTokens().get(idx));
+		double value = unknownStates.getProbability(AddressTag.valueOf(prediction));
+		value += emissionUnknowns.getProbability(address, idx, AddressTag.valueOf(prediction));
 				
 		return value;
 	}

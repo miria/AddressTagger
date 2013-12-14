@@ -29,7 +29,6 @@ import com.grunick.addresstagger.data.Address;
 import com.grunick.addresstagger.data.AddressTag;
 import com.grunick.addresstagger.input.InputException;
 import com.grunick.addresstagger.input.InputSource;
-import com.grunick.addresstagger.stat.Counter;
 import com.grunick.addresstagger.strategy.unknown.UnknownStrategy;
 
 public class MEMMStrategy implements TaggerStrategy {
@@ -46,7 +45,6 @@ public class MEMMStrategy implements TaggerStrategy {
 	List<AddressTag> knownStates = Arrays.asList(values.toArray(new AddressTag[] {}));
 	
 	protected UnknownStrategy emissionUnknowns;
-	private Counter<AddressTag> unknownStates = new Counter<AddressTag>();
 	
 	public MEMMStrategy(File entropyFile, File persistFile, int iterations, int cutoff, UnknownStrategy emissionUnknowns) {
 		this.entropyFile = entropyFile;
@@ -70,7 +68,6 @@ public class MEMMStrategy implements TaggerStrategy {
 					
 					emissionUnknowns.train(address);
 					for (int i=0; i<address.size(); i++) {
-						unknownStates.increment(address.getKnownTags().get(i));
 						writer.write(encodeAddress(address, i, null, null));
 						writer.newLine();
 					}
@@ -214,10 +211,7 @@ public class MEMMStrategy implements TaggerStrategy {
 		Map<String,Double> types = parseOutcomes(maxent.getAllOutcomes(outcomes));
 		if (types.containsKey(prediction))
 			return types.get(prediction);
-		double value = unknownStates.getProbability(AddressTag.valueOf(prediction));
-		value += emissionUnknowns.getProbability(address, idx, AddressTag.valueOf(prediction));
-				
-		return value;
+		return 0.000001 * emissionUnknowns.getProbability(address, idx, AddressTag.valueOf(prediction));
 	}
 	
 	protected static Pattern pattern = Pattern.compile("(.*?)=(.*?)\\[(.*?)\\]"); 

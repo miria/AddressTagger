@@ -36,7 +36,7 @@ public class InterpolatedHMMStrategy implements TaggerStrategy {
 		if (bigramTransProb.containsKey(bigramKey) && bigramTransProb.get(bigramKey).containsKey(state))
 			return bigramTransProb.get(bigramKey).get(state);
 
-		return tagCounter.getProbability(state);
+		return 0.000001;
 	}
 
 	protected double getEmissionProb(Address address, int idx, AddressTag state) throws InputException {

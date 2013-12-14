@@ -26,6 +26,10 @@ public class Counter<T> {
 	public int getTotal() {
 		return total;
 	}
+	
+	public void setTotal(int total) {
+		this.total = total;
+	}
 
 	public Map<T, Integer> getCountMap() {
 		return Collections.unmodifiableMap(counterMap);

@@ -17,7 +17,7 @@
     <target name="compile" depends="clean,resolve">
         <mkdir dir="${classes.dir}"/>
         <javac includeantruntime="true" srcdir="${src.dir}" destdir="${classes.dir}">
-        	<classpath refid="ivy.lib.classpath"/>
+        	<classpath refid="project.class.path"/>
         </javac>
     </target>
 
@@ -28,12 +28,13 @@
         </path>
         <taskdef resource="org/apache/ivy/ant/antlib.xml" uri="antlib:org.apache.ivy.ant" classpathref="ivy.lib.path"/>    
     	<ivy:retrieve pattern="${ivy.lib.dir}/[artifact]-[type]-[revision].[ext]" type="jar"/>
-    	<ivy:cachepath pathid="ivy.lib.classpath" />
     </target>
 	
     <target name="jar" depends="compile">
         <mkdir dir="${jar.dir}"/>
         <jar destfile="${jar.dir}/${ant.project.name}.jar" basedir="${classes.dir}">
+            <zipgroupfileset dir="${lib.dir}" includes="*.jar"/>
+            <zipgroupfileset dir="${ivy.lib.dir}" includes="*.jar"/>
             <manifest>
                 <attribute name="Main-Class" value="${main-class}"/>
             </manifest>
@@ -42,6 +43,9 @@
 	
 	<path id="project.class.path">  
 	    <fileset dir="${ivy.lib.dir}">
+	    	<include name="**/*.jar" />
+	    </fileset>
+	    <fileset dir="${lib.dir}">
 	    	<include name="**/*.jar" />
 	    </fileset>
 		<pathelement location="${classes.dir}"/> 

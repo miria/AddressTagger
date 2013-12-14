@@ -9,7 +9,6 @@ import com.grunick.addresstagger.data.Address;
 import com.grunick.addresstagger.data.AddressTag;
 import com.grunick.addresstagger.input.InputException;
 import com.grunick.addresstagger.input.InputSource;
-import com.grunick.addresstagger.stat.Counter;
 import com.grunick.addresstagger.stat.CounterMap;
 import com.grunick.addresstagger.strategy.unknown.UnknownStrategy;
 
@@ -21,7 +20,6 @@ public class HMMTrigramStrategy implements TaggerStrategy {
 	private Map<AddressTag, Map<String, Double>> emProb;
 	
 	protected UnknownStrategy emissionUnknowns;
-	private Counter<AddressTag> unknownStates = new Counter<AddressTag>();
 	
 	public HMMTrigramStrategy(UnknownStrategy emissionUnknowns) {
 		this.emissionUnknowns = emissionUnknowns;
@@ -37,7 +35,7 @@ public class HMMTrigramStrategy implements TaggerStrategy {
 		if (bigramTransProb.containsKey(bigramKey) && bigramTransProb.get(bigramKey).containsKey(state))
 			return bigramTransProb.get(bigramKey).get(state);
 
-		return unknownStates.getProbability( state);
+		return 0.000001;
 	}
 
 	protected double getEmissionProb(Address address, int idx, AddressTag state) throws InputException {
@@ -71,7 +69,6 @@ public class HMMTrigramStrategy implements TaggerStrategy {
 				
 				for (int i=0; i< address.size(); i++) {
 					bigramTransitionCounts.increment(prevState.toString(), address.getKnownTags().get(i));
-					unknownStates.increment(address.getKnownTags().get(i));
 					if (prevPrevState != null)
 						trigramTransitionCounts.increment(getTrigramKey(prevPrevState, prevState), address.getKnownTags().get(i));
 					emissionCounts.increment(address.getKnownTags().get(i), address.getAddressTokens().get(i));

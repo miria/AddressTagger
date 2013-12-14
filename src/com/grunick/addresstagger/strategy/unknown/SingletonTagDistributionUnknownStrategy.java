@@ -12,6 +12,7 @@ public class SingletonTagDistributionUnknownStrategy implements UnknownStrategy 
 	protected Counter<AddressTag> counter = null;
 	protected Map<String, Integer> wordCount = new HashMap<String,Integer>();
 	protected Map<String, AddressTag> wordToTagMap = new HashMap<String, AddressTag>();
+	protected int totalCount = 0;
 
 	@Override
 	public void train(Address address) {
@@ -22,6 +23,7 @@ public class SingletonTagDistributionUnknownStrategy implements UnknownStrategy 
 				wordToTagMap.put(token, tag);
 				wordCount.put(token, 0);
 			}
+			totalCount++;
 			wordCount.put(token, wordCount.get(token)+1);
 		}
 	}
@@ -35,6 +37,7 @@ public class SingletonTagDistributionUnknownStrategy implements UnknownStrategy 
 					continue;
 				counter.increment(wordToTagMap.get(key));
 			}
+			counter.setTotal(totalCount);
 		}
 		
 		return counter.getProbability(prediction);

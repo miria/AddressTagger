@@ -36,7 +36,7 @@ public class Constants {
 		public static final String NO_OP_STRATEGY= "noop";
 		public static final String MOST_LIKELY_TAG_STRATEGY = "mostFrequent";
 		public static final String HMM_BIGRAM_STRATEGY = "bigram";
-		public static final String KATZ_TRIGRAM_STRATEGY = "katz";
+		public static final String HMM_TRIGRAM_STRATEGY = "trigram";
 		public static final String KN_INTERPOLATED_STRATEGY = "kninterp";
 		public static final String MEMM_STRATEGY = "MEMM";
 		public static final String TBL_STRATEGY = "TBL";

@@ -21,8 +21,8 @@ public class TaggerStrategyFactory {
 			return new NoOpTaggerStrategy();
 		if (StrategyTypes.HMM_BIGRAM_STRATEGY.equalsIgnoreCase(type))
 			return new BigramHMMStrategy(getEmissionStrategy(strategyConfig));
-		if (StrategyTypes.KATZ_TRIGRAM_STRATEGY.equalsIgnoreCase(type))
-			return new KatzBackoffTrigramHMMStrategy(getEmissionStrategy(strategyConfig));
+		if (StrategyTypes.HMM_TRIGRAM_STRATEGY.equalsIgnoreCase(type))
+			return new TrigramHMMStrategy(getEmissionStrategy(strategyConfig));
 		if (StrategyTypes.KN_INTERPOLATED_STRATEGY.equalsIgnoreCase(type))
 			return new KNInterpolatedHMMStrategy(getEmissionStrategy(strategyConfig));
 		if (StrategyTypes.MEMM_STRATEGY.equalsIgnoreCase(type))

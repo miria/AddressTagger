@@ -18,6 +18,7 @@ public class AddressTagger {
 	
 	public void train() throws InputException {
 		strategy.train(config.getTrainingData());
+		strategy.processHeldOutData(config.getValidationData());
 	}
 	
 	public void tagAddress(Address address) throws InputException {

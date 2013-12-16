@@ -10,11 +10,11 @@ import java.util.Map;
 import org.apache.commons.io.FileUtils;
 
 import com.grunick.addresstagger.data.AddressTag;
-import com.grunick.addresstagger.input.InputConstants.TokenizerConfig;
+import com.grunick.addresstagger.data.Constants.TokenizerConfig;
+import com.grunick.addresstagger.data.Constants.TokenizerTypes;
 import com.grunick.addresstagger.input.InputException;
 import com.grunick.addresstagger.input.InputUtils;
 
-import com.grunick.addresstagger.input.InputConstants.TokenizerTypes;
 
 
 public class TokenizerFactory {

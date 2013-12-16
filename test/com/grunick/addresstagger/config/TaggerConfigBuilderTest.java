@@ -9,7 +9,7 @@ import org.apache.commons.configuration.Configuration;
 import org.apache.commons.configuration.ConfigurationException;
 import org.junit.Test;
 
-import com.grunick.addresstagger.input.InputConstants.InputSourceTypes;
+import com.grunick.addresstagger.data.Constants.InputSourceTypes;
 import com.grunick.addresstagger.strategy.NoOpTaggerStrategy;
 
 public class TaggerConfigBuilderTest {

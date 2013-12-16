@@ -7,8 +7,8 @@ import java.util.Map;
 
 import org.junit.Test;
 
-import com.grunick.addresstagger.input.InputConstants.TokenizerConfig;
-import com.grunick.addresstagger.input.InputConstants.TokenizerTypes;
+import com.grunick.addresstagger.data.Constants.TokenizerConfig;
+import com.grunick.addresstagger.data.Constants.TokenizerTypes;
 import com.grunick.addresstagger.input.InputException;
 
 public class TokenizerFactoryTest {

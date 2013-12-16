@@ -2,40 +2,63 @@ package com.grunick.addresstagger.strategy;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import com.grunick.addresstagger.data.Address;
 import com.grunick.addresstagger.data.AddressTag;
 import com.grunick.addresstagger.input.InputException;
 import com.grunick.addresstagger.input.InputSource;
+import com.grunick.addresstagger.stat.ContinuationCounter;
+import com.grunick.addresstagger.stat.Counter;
 import com.grunick.addresstagger.stat.CounterMap;
 import com.grunick.addresstagger.strategy.unknown.UnknownStrategy;
 
-public class HMMTrigramStrategy implements TaggerStrategy {
+public class KNInterpolatedHMMStrategy implements TaggerStrategy {
 
-	private Map<String, Map<AddressTag, Double>> bigramTransProb;
-	private Map<String, Map<AddressTag, Double>> trigramTransProb;
-
+	CounterMap<AddressTag, AddressTag> bigramTransitionCounts = new CounterMap<AddressTag, AddressTag>();
+	CounterMap<String, AddressTag> trigramTransitionCounts = new CounterMap<String, AddressTag>();
+	private Counter<AddressTag> tagCounter = new Counter<AddressTag>();
 	private Map<AddressTag, Map<String, Double>> emProb;
+	private ContinuationCounter<AddressTag> unigramContCounts = new ContinuationCounter<AddressTag>();
+	
+	private ContinuationCounter<String> bigramContCounts = new ContinuationCounter<String>();
+	private Map<AddressTag,Integer> bigramDistinctCounts = new HashMap<AddressTag, Integer>();
+	private Map<String,Integer> trigramDistinctCounts = new HashMap<String, Integer>();
 	
 	protected UnknownStrategy emissionUnknowns;
 	
-	public HMMTrigramStrategy(UnknownStrategy emissionUnknowns) {
+	private static final double absoluteBigramDiscount = 0.75;
+	private static final double absoluteTrigramDiscount = 0.75;
+	
+	public KNInterpolatedHMMStrategy(UnknownStrategy emissionUnknowns) {
 		this.emissionUnknowns = emissionUnknowns;
 	}
-
+	
 	protected double getTransitionProb(AddressTag prevPrevState, AddressTag prevState, AddressTag state) {
+		// TODO: should we use continuation counts for bigram transition?
+		Counter<AddressTag> bigramCounter = bigramTransitionCounts.getCounter(prevState);
+		double bigramProb = bigramCounter != null ? bigramCounter.getProbability(state, absoluteBigramDiscount) : 0.000001;
+		double bigramTotal = bigramCounter == null ? 1 : bigramCounter.getTotal();
+		double distinctCounts = bigramDistinctCounts.containsKey(state) ? bigramDistinctCounts.get(state) : 0.000001;
+		double remainingWeight = (absoluteBigramDiscount/bigramTotal) * distinctCounts; 
+		double bigramKNProb = bigramProb + unigramContCounts.getContinuationProb(state) * remainingWeight;
+		
+		double trigramKNProb = 0.0;
 		if (prevPrevState != null ) {
-			String trigramKey = getTrigramKey(prevPrevState, prevState);
-			if (trigramTransProb.containsKey(trigramKey) && trigramTransProb.get(trigramKey).containsKey(state))
-				return trigramTransProb.get(trigramKey).get(state);
+			String key = getTrigramKey(prevPrevState, prevState);
+			Counter<AddressTag> trigramCounter = trigramTransitionCounts.getCounter(key);
+			double trigramProb = trigramCounter != null ? trigramCounter.getProbability(state, absoluteTrigramDiscount) : 0.000001;
+			double trigramTotal = trigramCounter == null ? 1 : trigramCounter.getTotal();
+			distinctCounts = trigramDistinctCounts.containsKey(state) ? trigramDistinctCounts.get(state) : 0.000001;
+			remainingWeight = (absoluteTrigramDiscount/trigramTotal) * distinctCounts; 
+			trigramKNProb = trigramProb + bigramContCounts.getContinuationProb(key) * remainingWeight;
 		}
-		String bigramKey = prevState.toString();
-		if (bigramTransProb.containsKey(bigramKey) && bigramTransProb.get(bigramKey).containsKey(state))
-			return bigramTransProb.get(bigramKey).get(state);
+		
+		return trigramKNProb + bigramKNProb;
 
-		return 0.000001;
 	}
 
 	protected double getEmissionProb(Address address, int idx, AddressTag state) throws InputException {
@@ -51,9 +74,6 @@ public class HMMTrigramStrategy implements TaggerStrategy {
 	
 	@Override
 	public void train(InputSource source) throws InputException {
-		CounterMap<String, AddressTag> bigramTransitionCounts = new CounterMap<String, AddressTag>();
-		CounterMap<String, AddressTag> trigramTransitionCounts = new CounterMap<String, AddressTag>();
-
 		CounterMap<AddressTag, String> emissionCounts = new CounterMap<AddressTag, String>();
 		
 		while (source.hasNext()) {
@@ -65,24 +85,44 @@ public class HMMTrigramStrategy implements TaggerStrategy {
 				AddressTag prevPrevState = null;
 				AddressTag prevState = AddressTag.START;
 				emissionUnknowns.train(address);
-
 				
 				for (int i=0; i< address.size(); i++) {
-					bigramTransitionCounts.increment(prevState.toString(), address.getKnownTags().get(i));
-					if (prevPrevState != null)
-						trigramTransitionCounts.increment(getTrigramKey(prevPrevState, prevState), address.getKnownTags().get(i));
-					emissionCounts.increment(address.getKnownTags().get(i), address.getAddressTokens().get(i));
+					AddressTag currentState = address.getKnownTag(i);
+					unigramContCounts.add(currentState, prevState);
+					bigramTransitionCounts.increment(prevState, currentState);
+					
+					if (prevPrevState != null) {
+						String prevStates = getTrigramKey(prevPrevState, prevState);
+						bigramContCounts.add(currentState.toString(), prevStates);
+						trigramTransitionCounts.increment(prevStates, currentState);
+					} 
+					emissionCounts.increment(address.getKnownTag(i), address.getToken(i));
 					prevPrevState = prevState;
-					prevState = address.getKnownTags().get(i);
+					prevState = currentState;
+					tagCounter.increment(currentState);
 				}
-				bigramTransitionCounts.increment(prevState.toString(), AddressTag.STOP);
+				unigramContCounts.add(AddressTag.STOP, prevState);
+				bigramContCounts.add(AddressTag.STOP.toString(), getTrigramKey(prevPrevState, prevState));
+				bigramTransitionCounts.increment(prevState, AddressTag.STOP);
 				if (prevPrevState != null)
 					trigramTransitionCounts.increment(getTrigramKey(prevPrevState, prevState), AddressTag.STOP);
 			} catch (InputException ie) {}
 		}
 
-		bigramTransProb = bigramTransitionCounts.getProbabilityMaps();
-		trigramTransProb = trigramTransitionCounts.getProbabilityMaps();
+		for (AddressTag tag : bigramTransitionCounts.keySet()) {
+			Set<Integer> distinctCounts = new HashSet<Integer>();
+			for (Integer value : bigramTransitionCounts.getCounter(tag).getCountMap().values())
+				distinctCounts.add(value);
+			bigramDistinctCounts.put(tag, distinctCounts.size());
+		}
+		
+		for (String tag : trigramTransitionCounts.keySet()) {
+			Set<Integer> distinctCounts = new HashSet<Integer>();
+			for (Integer value : trigramTransitionCounts.getCounter(tag).getCountMap().values())
+				distinctCounts.add(value);
+			trigramDistinctCounts.put(tag, distinctCounts.size());
+		}
+
 		emProb = emissionCounts.getProbabilityMaps();	
 	}
 
@@ -186,4 +226,8 @@ public class HMMTrigramStrategy implements TaggerStrategy {
 			address.setTag(i, tags.get(i));
 		}
 	}
+	
+	@Override
+	public void processHeldOutData(InputSource source) throws InputException {}
+
 }

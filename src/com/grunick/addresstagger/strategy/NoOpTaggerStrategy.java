@@ -1,18 +1,18 @@
 package com.grunick.addresstagger.strategy;
 
 import com.grunick.addresstagger.data.Address;
+import com.grunick.addresstagger.input.InputException;
 import com.grunick.addresstagger.input.InputSource;
 
 public class NoOpTaggerStrategy implements TaggerStrategy {
 
 	@Override
-	public void train(InputSource source) {
-
-	}
+	public void train(InputSource source) {}
 
 	@Override
-	public void tagAddress(Address address) {
-		
-	}
+	public void tagAddress(Address address) {}
+	
+	@Override
+	public void processHeldOutData(InputSource source) throws InputException {}
 
 }

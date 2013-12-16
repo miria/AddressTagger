@@ -13,7 +13,7 @@ public class Viterbi<S, O> {
 	private S startState;
 	private S stopState;
 
-	private class ViterbiNode {
+	protected class ViterbiNode {
 		private double totalScore;
 		private S maxState;
 		private double maxScore;

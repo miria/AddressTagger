@@ -13,19 +13,23 @@ import com.grunick.addresstagger.stat.Counter;
 import com.grunick.addresstagger.stat.CounterMap;
 import com.grunick.addresstagger.strategy.unknown.UnknownStrategy;
 
-public class InterpolatedHMMStrategy implements TaggerStrategy {
+import static com.grunick.addresstagger.data.Constants.ALMOST_ZERO;
+
+
+public class KatzBackoffTrigramHMMStrategy implements TaggerStrategy {
 
 	private Map<String, Map<AddressTag, Double>> bigramTransProb;
 	private Map<String, Map<AddressTag, Double>> trigramTransProb;
 	private Counter<AddressTag> tagCounter;
+
 	private Map<AddressTag, Map<String, Double>> emProb;
 	
 	protected UnknownStrategy emissionUnknowns;
 	
-	public InterpolatedHMMStrategy(UnknownStrategy emissionUnknowns) {
+	public KatzBackoffTrigramHMMStrategy(UnknownStrategy emissionUnknowns) {
 		this.emissionUnknowns = emissionUnknowns;
 	}
-	
+
 	protected double getTransitionProb(AddressTag prevPrevState, AddressTag prevState, AddressTag state) {
 		if (prevPrevState != null ) {
 			String trigramKey = getTrigramKey(prevPrevState, prevState);
@@ -36,7 +40,7 @@ public class InterpolatedHMMStrategy implements TaggerStrategy {
 		if (bigramTransProb.containsKey(bigramKey) && bigramTransProb.get(bigramKey).containsKey(state))
 			return bigramTransProb.get(bigramKey).get(state);
 
-		return 0.000001;
+		return ALMOST_ZERO;
 	}
 
 	protected double getEmissionProb(Address address, int idx, AddressTag state) throws InputException {
@@ -66,6 +70,7 @@ public class InterpolatedHMMStrategy implements TaggerStrategy {
 				AddressTag prevPrevState = null;
 				AddressTag prevState = AddressTag.START;
 				emissionUnknowns.train(address);
+
 				
 				for (int i=0; i< address.size(); i++) {
 					bigramTransitionCounts.increment(prevState.toString(), address.getKnownTags().get(i));
@@ -187,5 +192,7 @@ public class InterpolatedHMMStrategy implements TaggerStrategy {
 			address.setTag(i, tags.get(i));
 		}
 	}
-
+	
+	@Override
+	public void processHeldOutData(InputSource source) throws InputException {}
 }

@@ -7,7 +7,7 @@ import java.util.Map;
 
 import org.junit.Test;
 
-import com.grunick.addresstagger.input.InputConstants.FileConfig;
+import com.grunick.addresstagger.data.Constants.FileConfig;
 
 public class InputSourceFactoryTest {
 	

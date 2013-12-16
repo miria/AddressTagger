@@ -26,6 +26,14 @@ public class Address {
 		return Collections.unmodifiableList(addressTokens);
 	}
 	
+	public String getToken(int idx) {
+		return addressTokens.get(idx);
+	}
+	
+	public AddressTag getKnownTag(int idx) {
+		return knownTags.get(idx);
+	}
+	
 	
 	public List<AddressTag> getKnownTags() {
 		return Collections.unmodifiableList(knownTags);

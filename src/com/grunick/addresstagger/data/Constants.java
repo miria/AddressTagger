@@ -1,8 +1,11 @@
-package com.grunick.addresstagger.input;
+package com.grunick.addresstagger.data;
 
-public class InputConstants {
+public class Constants {
 	
-	private InputConstants() {}
+	private Constants() {}
+	
+	public static final double ALMOST_ZERO = 0.00000001d;
+	
 	
 	public static class FileConfig {
 		
@@ -32,9 +35,9 @@ public class InputConstants {
 	public static class StrategyTypes {
 		public static final String NO_OP_STRATEGY= "noop";
 		public static final String MOST_LIKELY_TAG_STRATEGY = "mostFrequent";
-		public static final String HMM_BIGRAM_STRATEGY = "HMMBigram";
-		public static final String HMM_TRIGRAM_STRATEGY = "HMMTrigram";
-		public static final String HMM_INTERPOLATED_STRATEGY = "interpolated";
+		public static final String HMM_BIGRAM_STRATEGY = "bigram";
+		public static final String KATZ_TRIGRAM_STRATEGY = "katz";
+		public static final String KN_INTERPOLATED_STRATEGY = "kninterp";
 		public static final String MEMM_STRATEGY = "MEMM";
 		public static final String TBL_STRATEGY = "TBL";
 		public static final String CRF_STRATEGY = "CRF";
@@ -56,7 +59,6 @@ public class InputConstants {
 	public static class UnknownWordTypes {
 		public static final String FIXED_VALUE_STRATEGY = "fixed";
 		public static final String MAXENT_STRATEGY = "maxent";
-		public static final String FULL_DIST_STRATEGY = "fullDist";
 		public static final String SINGLETON_DIST_STRATEGY = "singleDist";
 		public static final String FEATURE_STRATEGY = "feature";
 	}

@@ -60,4 +60,19 @@ public class Counter<T> {
 			return 0.000001;
 		return (double)counterMap.get(key)/(double)total;
 	}
+	
+	public double getProbability(T key, double discount) {
+		if (total == 0)
+			return 0;
+		double counterValue = counterMap.containsKey(key) ? counterMap.get(key) : 0; 
+		return Math.max(counterValue-discount, 0.0)/(double)total;
+	}
+	
+	public boolean containsKey(T key) {
+		return counterMap.containsKey(key);
+	}
+	
+	public int size() {
+		return counterMap.size();
+	}
 }

@@ -5,7 +5,7 @@ import static org.junit.Assert.assertTrue;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.grunick.addresstagger.input.InputConstants.StrategyTypes;
+import com.grunick.addresstagger.data.Constants.StrategyTypes;
 import com.grunick.addresstagger.input.InputException;
 
 import org.junit.Test;

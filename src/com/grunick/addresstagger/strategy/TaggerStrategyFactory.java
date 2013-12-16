@@ -3,8 +3,8 @@ package com.grunick.addresstagger.strategy;
 import java.io.File;
 import java.util.Map;
 
-import com.grunick.addresstagger.input.InputConstants.StrategyConfig;
-import com.grunick.addresstagger.input.InputConstants.StrategyTypes;
+import com.grunick.addresstagger.data.Constants.StrategyConfig;
+import com.grunick.addresstagger.data.Constants.StrategyTypes;
 import com.grunick.addresstagger.input.InputException;
 import com.grunick.addresstagger.input.InputUtils;
 import com.grunick.addresstagger.strategy.unknown.UnknownStrategy;
@@ -20,11 +20,11 @@ public class TaggerStrategyFactory {
 		if (StrategyTypes.NO_OP_STRATEGY.equalsIgnoreCase(type))
 			return new NoOpTaggerStrategy();
 		if (StrategyTypes.HMM_BIGRAM_STRATEGY.equalsIgnoreCase(type))
-			return new HMMBigramStrategy(getEmissionStrategy(strategyConfig));
-		if (StrategyTypes.HMM_TRIGRAM_STRATEGY.equalsIgnoreCase(type))
-			return new HMMTrigramStrategy( getEmissionStrategy(strategyConfig));
-		if (StrategyTypes.HMM_INTERPOLATED_STRATEGY.equalsIgnoreCase(type))
-			return new InterpolatedHMMStrategy(getEmissionStrategy(strategyConfig));
+			return new BigramHMMStrategy(getEmissionStrategy(strategyConfig));
+		if (StrategyTypes.KATZ_TRIGRAM_STRATEGY.equalsIgnoreCase(type))
+			return new KatzBackoffTrigramHMMStrategy(getEmissionStrategy(strategyConfig));
+		if (StrategyTypes.KN_INTERPOLATED_STRATEGY.equalsIgnoreCase(type))
+			return new KNInterpolatedHMMStrategy(getEmissionStrategy(strategyConfig));
 		if (StrategyTypes.MEMM_STRATEGY.equalsIgnoreCase(type))
 			return getMEMMStrategy(strategyConfig);
 		if (StrategyTypes.TBL_STRATEGY.equalsIgnoreCase(type))

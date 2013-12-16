@@ -2,8 +2,8 @@ package com.grunick.addresstagger.strategy.unknown;
 
 import java.util.Map;
 
-import com.grunick.addresstagger.input.InputConstants.UnknownWordConfig;
-import com.grunick.addresstagger.input.InputConstants.UnknownWordTypes;
+import com.grunick.addresstagger.data.Constants.UnknownWordConfig;
+import com.grunick.addresstagger.data.Constants.UnknownWordTypes;
 import com.grunick.addresstagger.input.InputException;
 import com.grunick.addresstagger.input.InputUtils;
 
@@ -12,8 +12,6 @@ public class UnknownStrategyFactory {
 	private UnknownStrategyFactory() {}
 	
 	public static UnknownStrategy getUnknownEmissionStrategy(String type, Map<String,String> config) throws InputException {
-		if (UnknownWordTypes.FULL_DIST_STRATEGY.equalsIgnoreCase(type))
-			return new FullTagDistributionUnknownStrategy();
 		if (UnknownWordTypes.SINGLETON_DIST_STRATEGY.equalsIgnoreCase(type))
 			return new SingletonTagDistributionUnknownStrategy();
 		if (UnknownWordTypes.FEATURE_STRATEGY.equalsIgnoreCase(type))

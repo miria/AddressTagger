@@ -2,8 +2,8 @@ package com.grunick.addresstagger.input;
 
 import java.util.Map;
 
-import com.grunick.addresstagger.input.InputConstants.FileConfig;
-import com.grunick.addresstagger.input.InputConstants.InputSourceTypes;
+import com.grunick.addresstagger.data.Constants.FileConfig;
+import com.grunick.addresstagger.data.Constants.InputSourceTypes;
 
 public class InputSourceFactory {
 	

@@ -3,6 +3,7 @@ package com.grunick.addresstagger.stat;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 public class CounterMap<T,U> {
 	
@@ -29,6 +30,10 @@ public class CounterMap<T,U> {
 		}
 		
 		return Collections.unmodifiableMap(probMap);
+	}
+	
+	public Set<T> keySet() {
+		return counterMap.keySet();
 	}
 	
 	

@@ -47,5 +47,8 @@ public class MostLikelyTagStrategy implements TaggerStrategy {
 			address.setTag(i, tag);
 		}		
 	}
+	
+	@Override
+	public void processHeldOutData(InputSource source) throws InputException {}
 
 }

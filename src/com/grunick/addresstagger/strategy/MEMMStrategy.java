@@ -31,6 +31,9 @@ import com.grunick.addresstagger.input.InputException;
 import com.grunick.addresstagger.input.InputSource;
 import com.grunick.addresstagger.strategy.unknown.UnknownStrategy;
 
+import static com.grunick.addresstagger.data.Constants.ALMOST_ZERO;
+
+
 public class MEMMStrategy implements TaggerStrategy {
 	
 	protected MaxentModel maxent;
@@ -211,7 +214,7 @@ public class MEMMStrategy implements TaggerStrategy {
 		Map<String,Double> types = parseOutcomes(maxent.getAllOutcomes(outcomes));
 		if (types.containsKey(prediction))
 			return types.get(prediction);
-		return 0.000001 * emissionUnknowns.getProbability(address, idx, AddressTag.valueOf(prediction));
+		return ALMOST_ZERO * emissionUnknowns.getProbability(address, idx, AddressTag.valueOf(prediction));
 	}
 	
 	protected static Pattern pattern = Pattern.compile("(.*?)=(.*?)\\[(.*?)\\]"); 
@@ -226,5 +229,8 @@ public class MEMMStrategy implements TaggerStrategy {
 		}
 		return map;
 	}
+	
+	@Override
+	public void processHeldOutData(InputSource source) throws InputException {}
 
 }

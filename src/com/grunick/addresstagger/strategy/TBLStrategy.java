@@ -86,4 +86,7 @@ public class TBLStrategy implements TaggerStrategy {
 
 	}
 
+	@Override
+	public void processHeldOutData(InputSource source) throws InputException {}
+
 }

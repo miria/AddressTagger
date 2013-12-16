@@ -12,21 +12,23 @@ import com.grunick.addresstagger.input.InputSource;
 import com.grunick.addresstagger.stat.CounterMap;
 import com.grunick.addresstagger.strategy.unknown.UnknownStrategy;
 
-public class HMMBigramStrategy implements TaggerStrategy {
+import static com.grunick.addresstagger.data.Constants.ALMOST_ZERO;
+
+public class BigramHMMStrategy implements TaggerStrategy {
 	
 	private Map<AddressTag, Map<AddressTag, Double>> transProb;
 	private Map<AddressTag, Map<String, Double>> emProb;
 	
 	protected UnknownStrategy emissionUnknowns;
 	
-	public HMMBigramStrategy(UnknownStrategy emissionUnknowns) {
+	public BigramHMMStrategy(UnknownStrategy emissionUnknowns) {
 		this.emissionUnknowns = emissionUnknowns;
 	}
 	
 	protected double getTransitionProb(AddressTag state1, AddressTag state2) {
 		if (transProb.containsKey(state1) && transProb.get(state1).containsKey(state2))
 			return transProb.get(state1).get(state2);
-		return 0.000001;
+		return ALMOST_ZERO;
 	}
 
 	protected double getEmissionProb(Address address, int idx, AddressTag state) throws InputException {
@@ -145,5 +147,8 @@ public class HMMBigramStrategy implements TaggerStrategy {
 			address.setTag(i, tags.get(i));
 		}
 	}
+	
+	@Override
+	public void processHeldOutData(InputSource source) throws InputException {}
 
 }

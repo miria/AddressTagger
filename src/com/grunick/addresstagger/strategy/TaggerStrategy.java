@@ -10,6 +10,8 @@ public interface TaggerStrategy {
 	
 	public void tagAddress(Address address) throws InputException;
 	
+	public void processHeldOutData(InputSource source) throws InputException;
+	
 	
 
 }

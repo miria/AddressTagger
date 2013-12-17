@@ -1,6 +1,7 @@
 package com.grunick.addresstagger.strategy;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -33,12 +34,17 @@ public class KNInterpolatedHMMStrategy implements TaggerStrategy {
 	private static final double absoluteBigramDiscount = 0.75;
 	private static final double absoluteTrigramDiscount = 0.75;
 	
+	private List<AddressTag> nonTerminalTags;
+	
 	public KNInterpolatedHMMStrategy(UnknownStrategy emissionUnknowns) {
 		this.emissionUnknowns = emissionUnknowns;
+		
+		nonTerminalTags = new ArrayList<AddressTag>(Arrays.asList(AddressTag.values()));
+		nonTerminalTags.remove(AddressTag.START);
+		nonTerminalTags.remove(AddressTag.STOP);
 	}
 	
 	protected double getTransitionProb(AddressTag prevPrevState, AddressTag prevState, AddressTag state) {
-		// TODO: should we use continuation counts for bigram transition?
 		Counter<AddressTag> bigramCounter = bigramTransitionCounts.getCounter(prevState);
 		double bigramProb = bigramCounter != null ? bigramCounter.getProbability(state, absoluteBigramDiscount) : 0.000001;
 		double bigramTotal = bigramCounter == null ? 1 : bigramCounter.getTotal();
@@ -125,6 +131,8 @@ public class KNInterpolatedHMMStrategy implements TaggerStrategy {
 
 		emProb = emissionCounts.getProbabilityMaps();	
 	}
+	
+	
 
 	public List<AddressTag> viterbi(Address address) throws InputException {
 		List<String> observations = address.getAddressTokens();
@@ -144,10 +152,10 @@ public class KNInterpolatedHMMStrategy implements TaggerStrategy {
 		// Iteration step
 		for (int i=1; i < observations.size(); i++) {
 			HashMap<String, ViterbiNode<String>> nextStates = new HashMap<String, ViterbiNode<String>>();
-			for (AddressTag next : AddressTag.values()) {
+			for (AddressTag next : nonTerminalTags) {
 
 
-				for (AddressTag previous : AddressTag.values()) {
+				for (AddressTag previous : nonTerminalTags) {
 					double stateTotal = 0.0;
 					String maxArg = null;
 					double stateMax = 0.0;
@@ -221,7 +229,6 @@ public class KNInterpolatedHMMStrategy implements TaggerStrategy {
 	@Override
 	public void tagAddress(Address address) throws InputException {
 		List<AddressTag> tags = viterbi(address);
-		
 		for (int i=0; i< address.size(); i++) {
 			address.setTag(i, tags.get(i));
 		}
